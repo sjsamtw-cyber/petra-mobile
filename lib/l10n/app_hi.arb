@@ -1,0 +1,754 @@
+{
+  "drawerHomeMenuTitle": "घर",
+  "@drawerHomeMenuTitle": {
+    "description": "ड्रॉवर होम मेनू का शीर्षक"
+  },
+  "welcomeMessage": "स्कूलों को कल के हीरों का मार्गदर्शन करने में सक्षम बना रहे हैं एक बेहतर भविष्य के लिए",
+  "@welcomeMessage": {
+    "description": "होम स्क्रीन पर प्रदर्शित एक स्वागत संदेश"
+  },
+  "loginTitle": "लॉगिन",
+  "@loginTitle": {
+    "description": "लॉगिन स्क्रीन के लिए शीर्षक"
+  },
+  "loginButton": "लॉगिन करें",
+  "@loginButton": {
+    "description": "लॉगिन बटन के लिए टेक्स्ट"
+  },
+  "loginFailedMessage": "लॉगिन विफल। कृपया पुन: प्रयास करें।",
+  "@loginFailedMessage": {
+    "description": "लॉगिन विफल होने पर प्रदर्शित संदेश"
+  },
+  "usernameLabel": "उपयोगकर्ता नाम",
+  "@usernameLabel": {
+    "description": "उपयोगकर्ता नाम फील्ड के लिए लेबल"
+  },
+  "passwordLabel": "पासवर्ड",
+  "@passwordLabel": {
+    "description": "पासवर्ड फील्ड के लिए लेबल"
+  },
+  "usernameRequiredError": "कृपया अपना उपयोगकर्ता नाम दर्ज करें",
+  "@usernameRequiredError": {
+    "description": "उपयोगकर्ता नाम दर्ज नहीं किए जाने पर त्रुटि संदेश"
+  },
+  "passwordRequiredError": "कृपया अपना पासवर्ड दर्ज करें",
+  "@passwordRequiredError": {
+    "description": "पासवर्ड दर्ज नहीं किए जाने पर त्रुटि संदेश"
+  },
+  "registerButton": "पंजीकरण करें",
+  "@registerButton": {
+    "description": "पंजीकरण बटन के लिए टेक्स्ट"
+  },
+  "switchSchoolButton": "स्कूल बदलें",
+  "@switchSchoolButton": {
+    "description": "स्कूल बदलने वाले बटन के लिए टेक्स्ट"
+  },
+  "registrationNotImplemented": "पंजीकरण अभी लागू नहीं किया गया है",
+  "@registrationNotImplemented": {
+    "description": "पंजीकरण लागू न होने पर संदेश"
+  },
+  "enableNotifications": "सूचनाएं सक्षम करें",
+  "@enableNotifications": {
+    "description": "उपयोगकर्ताओं को सूचनाएं सक्षम करने के लिए डायलॉग का शीर्षक"
+  },
+  "notificationPermissionMessage": "कृपया ऐप को सही ढंग से काम करने के लिए सूचनाएं सक्षम करें।",
+  "@notificationPermissionMessage": {
+    "description": "सूचनाओं की आवश्यकता के बारे में बताने वाला संदेश"
+  },
+  "openSettings": "सेटिंग्स खोलें",
+  "@openSettings": {
+    "description": "डिवाइस सेटिंग्स खोलने के लिए बटन टेक्स्ट"
+  },
+  "cancel": "रद्द करें",
+  "@cancel": {
+    "description": "सामान्य रद्द बटन टेक्स्ट"
+  },
+  "updateAvailable": "अपडेट उपलब्ध है",
+  "@updateAvailable": {
+    "description": "ऐप अपडेट के बारे में सूचित करने वाले डायलॉग का शीर्षक"
+  },
+  "updateMessage": "कृपया सर्वोत्तम अनुभव के लिए ऐप को नवीनतम संस्करण में अपडेट करें।",
+  "@updateMessage": {
+    "description": "ऐप को अपडेट करने की आवश्यकता समझाने वाला संदेश"
+  },
+  "update": "अपडेट करें",
+  "@update": {
+    "description": "ऐप अपडेट ट्रिगर करने के लिए बटन टेक्स्ट"
+  },
+  "enterSchoolCodeTitle": "स्कूल कोड दर्ज करें",
+  "@enterSchoolCodeTitle": {
+    "description": "स्कूल कोड प्रवेश स्क्रीन के लिए शीर्षक"
+  },
+  "schoolCodeLabel": "स्कूल कोड",
+  "@schoolCodeLabel": {
+    "description": "स्कूल कोड इनपुट फ़ील्ड के लिए लेबल"
+  },
+  "schoolCodeRequiredError": "स्कूल कोड आवश्यक है।",
+  "@schoolCodeRequiredError": {
+    "description": "स्कूल कोड दर्ज न होने पर त्रुटि संदेश"
+  },
+  "submitButton": "जमा करें",
+  "@submitButton": {
+    "description": "सबमिट बटन के लिए टेक्स्ट"
+  },
+  "invalidSchoolCode": "अमान्य स्कूल कोड।",
+  "@invalidSchoolCode": {
+    "description": "अमान्य स्कूल कोड के लिए त्रुटि संदेश"
+  },
+  "notAPartOfFamilyText": "अभी तक पेट्रासॉफ्ट परिवार का हिस्सा नहीं हैं?",
+  "@notAPartOfFamilyText": {
+    "description": "'आज ही हमसे जुड़ें' बटन के ऊपर प्रदर्शित टेक्स्ट"
+  },
+  "dayDetailsTitle": "दिन का विवरण",
+  "@dayDetailsTitle": {
+    "description": "दिन के विवरण दृश्य के लिए शीर्षक"
+  },
+  "joinUsTodayButton": "आज ही हमसे जुड़ें",
+  "@joinUsTodayButton": {
+    "description": "'आज ही हमसे जुड़ें' बटन के लिए टेक्स्ट"
+  },
+  "petrasoftSolutionsText": "पेट्रासॉफ्ट सॉल्यूशंस",
+  "@petrasoftSolutionsText": {
+    "description": "कंपनी लोगो के नीचे प्रदर्शित टेक्स्ट"
+  },
+  "errorValidatingCode": "कोड सत्यापित करने में त्रुटि। कृपया पुन: प्रयास करें।",
+  "@errorValidatingCode": {
+    "description": "स्कूल कोड सत्यापित करते समय जेनेरिक त्रुटि संदेश"
+  },
+  "couldNotOpenLink": "लिंक नहीं खोल सका।",
+  "@couldNotOpenLink": {
+    "description": "URL लॉन्च न होने पर त्रुटि संदेश"
+  },
+  "drawerSchoolCodeTitle": "स्कूल कोड",
+  "@drawerSchoolCodeTitle": {
+    "description": "ड्रॉवर स्कूल कोड मेनू आइटम का शीर्षक"
+  },
+  "drawerAboutTitle": "हमारे बारे में",
+  "@drawerAboutTitle": {
+    "description": "ड्रॉवर हमारे बारे में मेनू आइटम का शीर्षक"
+  },
+  "drawerErrorTitle": "त्रुटि",
+  "@drawerErrorTitle": {
+    "description": "ड्रॉवर त्रुटि मेनू आइटम का शीर्षक (परीक्षण के लिए)"
+  },
+  "loadingText": "लोड हो रहा है...",
+  "@loadingText": {
+    "description": "लोडिंग ऑपरेशन के दौरान दिखाया गया टेक्स्ट"
+  },
+  "settingsTitle": "सेटिंग्स",
+  "@settingsTitle": {
+    "description": "Title for the settings screen"
+  },
+  "themeText": "थीम",
+  "@themeText": {
+    "description": "Label for theme section in settings"
+  },
+  "lightModeText": "लाइट मोड",
+  "@lightModeText": {
+    "description": "Text for light mode theme option"
+  },
+  "darkModeText": "डार्क मोड",
+  "@darkModeText": {
+    "description": "Text for dark mode theme option"
+  },
+  "preferencesText": "प्राथमिकताएं",
+  "@preferencesText": {
+    "description": "Label for preferences section in settings"
+  },
+  "notificationsText": "सूचनाएं",
+  "@notificationsText": {
+    "description": "Label for notifications option in settings"
+  },
+  "languageText": "भाषा",
+  "@languageText": {
+    "description": "Label for language option in settings"
+  },
+  "informationText": "जानकारी",
+  "@informationText": {
+    "description": "Label for information section in settings"
+  },
+  "aboutUsText": "हमारे बारे में",
+  "@aboutUsText": {
+    "description": "Label for about us option in settings"
+  },
+  "privacyPolicyText": "गोपनीयता नीति",
+  "@privacyPolicyText": {
+    "description": "Label for privacy policy option in settings"
+  },
+  "getHelpText": "सहायता प्राप्त करें",
+  "@getHelpText": {
+    "description": "Label for get help option in settings"
+  },
+  "accountText": "खाता",
+  "@accountText": {
+    "description": "Label for account section in settings"
+  },
+  "switchSchoolText": "स्कूल बदलें",
+  "@switchSchoolText": {
+    "description": "Label for switch school option in settings"
+  },
+  "signOutText": "साइन आउट",
+  "@signOutText": {
+    "description": "Label for sign out option in settings"
+  },
+  "languageHumanReadableName": "हिन्दी",
+  "@languageHumanReadableName": {
+    "description": "Human readable name of the current language"
+  },
+  "dashboardWelcome": "स्वागत {name}",
+  "@dashboardWelcome": {
+    "description": "डैशबोर्ड पर उपयोगकर्ता नाम के साथ स्वागत संदेश",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "ईवा"
+      }
+    }
+  },
+  "markAttendanceText": "उपस्थिति\nअंकित करें",
+  "@markAttendanceText": {
+    "description": "डैशबोर्ड पर उपस्थिति अंकित करने के बटन का लेबल"
+  },
+  "reviewAttendanceText": "उपस्थिति\nसमीक्षा करें",
+  "@reviewAttendanceText": {
+    "description": "डैशबोर्ड पर उपस्थिति समीक्षा बटन का लेबल"
+  },
+  "attendancePercentageText": "उपस्थिति\nप्रतिशत",
+  "@attendancePercentageText": {
+    "description": "डैशबोर्ड पर उपस्थिति प्रतिशत बटन का लेबल"
+  },
+  "markAttendanceTitle": "उपस्थिति अंकित करें",
+  "@markAttendanceTitle": {
+    "description": "उपस्थिति अंकित करने के पेज का शीर्षक"
+  },
+  "reviewAttendanceTitle": "उपस्थिति समीक्षा करें",
+  "@reviewAttendanceTitle": {
+    "description": "उपस्थिति समीक्षा पेज का शीर्षक"
+  },
+  "attendancePercentageTitle": "उपस्थिति प्रतिशत",
+  "@attendancePercentageTitle": {
+    "description": "उपस्थिति प्रतिशत पेज का शीर्षक"
+  },
+  "noticeBoardText": "सूचना\nबोर्ड",
+  "@noticeBoardText": {
+    "description": "डैशबोर्ड पर सूचना बोर्ड बटन का लेबल"
+  },
+  "busTrackingText": "बस\nट्रैकिंग",
+  "@busTrackingText": {
+    "description": "डैशबोर्ड पर बस ट्रैकिंग बटन का लेबल"
+  },
+  "calendarText": "कैलेंडर",
+  "@calendarText": {
+    "description": "डैशबोर्ड पर कैलेंडर बटन का लेबल"
+  },
+  "month": "महीना",
+  "@month": {
+    "description": "कैलेंडर में महीना चयनकर्ता का लेबल"
+  },
+  "selectClass": "कक्षा चुनें",
+  "@selectClass": {
+    "description": "कक्षा चयनकर्ता ड्रॉपडाउन का लेबल"
+  },
+  "noClassesAvailable": "कोई कक्षा उपलब्ध नहीं",
+  "@noClassesAvailable": {
+    "description": "जब कोई कक्षा उपलब्ध नहीं हो तो संदेश"
+  },
+  "pleaseLoginAgain": "कृपया पुनः लॉगिन करें",
+  "@pleaseLoginAgain": {
+    "description": "जब उपयोगकर्ता को पुनः लॉगिन करने की आवश्यकता हो तो संदेश"
+  },
+  "failedToLoadClasses": "कक्षाएं लोड करने में विफल। कृपया पुन: प्रयास करें।",
+  "@failedToLoadClasses": {
+    "description": "कक्षाएं लोड करने में विफल होने पर त्रुटि संदेश"
+  },
+  "errorLoadingClasses": "कक्षाएं लोड करते समय त्रुटि",
+  "@errorLoadingClasses": {
+    "description": "कक्षा लोडिंग के लिए सामान्य त्रुटि संदेश"
+  },
+  "pleaseSelectClassFirst": "कृपया पहले एक कक्षा चुनें",
+  "@pleaseSelectClassFirst": {
+    "description": "जब कोई कक्षा चयनित नहीं हो तो संदेश"
+  },
+  "noStudentsFoundInClass": "इस कक्षा में कोई छात्र नहीं मिला",
+  "@noStudentsFoundInClass": {
+    "description": "जब कक्षा में कोई छात्र नहीं हो तो संदेश"
+  },
+  "notWorkingDayFor": "आज {className} के लिए कार्य दिवस नहीं है",
+  "@notWorkingDayFor": {
+    "description": "जब आज कार्य दिवस नहीं हो तो संदेश",
+    "placeholders": {
+      "className": {
+        "type": "String",
+        "description": "कक्षा का नाम"
+      }
+    }
+  },
+  "attendanceAlreadyMarked": "उपस्थिति पहले से चिह्नित है",
+  "@attendanceAlreadyMarked": {
+    "description": "जब उपस्थिति पहले से चिह्नित हो तो संदेश"
+  },
+  "attendanceAlreadyMarkedFor": "{className} के लिए आज की उपस्थिति पहले से चिह्नित है। यदि आपको बदलाव करने की आवश्यकता है, तो कृपया वेब इंटरफेस का उपयोग करें।",
+  "@attendanceAlreadyMarkedFor": {
+    "description": "जब उपस्थिति पहले से चिह्नित हो तो विस्तृत संदेश",
+    "placeholders": {
+      "className": {
+        "type": "String",
+        "description": "कक्षा का नाम"
+      }
+    }
+  },
+  "viewHistoricalAttendance": "ऐतिहासिक उपस्थिति देखें",
+  "@viewHistoricalAttendance": {
+    "description": "ऐतिहासिक उपस्थिति देखने के लिए बटन टेक्स्ट"
+  },
+  "selectDate": "दिनांक चुनें",
+  "@selectDate": {
+    "description": "दिनांक चयन के लिए हेडर"
+  },
+  "studentsCount": "छात्र ({count})",
+  "@studentsCount": {
+    "description": "छात्र संख्या दिखाने वाला हेडर",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "description": "छात्रों की संख्या"
+      }
+    }
+  },
+  "presentCount": "उपस्थित: {count}",
+  "@presentCount": {
+    "description": "उपस्थित छात्रों की संख्या",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "description": "उपस्थित छात्रों की संख्या"
+      }
+    }
+  },
+  "absentCount": "अनुपस्थित: {count}",
+  "@absentCount": {
+    "description": "अनुपस्थित छात्रों की संख्या",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "description": "अनुपस्थित छात्रों की संख्या"
+      }
+    }
+  },
+  "considerAddingRemarksForAbsent": "अनुपस्थित छात्रों के लिए टिप्पणी जोड़ने पर विचार करें",
+  "@considerAddingRemarksForAbsent": {
+    "description": "अनुपस्थित छात्रों के लिए टिप्पणी जोड़ने का सुझाव"
+  },
+  "canAddRemarksForAnyStudent": "आप आवश्यकतानुसार किसी भी छात्र के लिए टिप्पणी जोड़ सकते हैं",
+  "@canAddRemarksForAnyStudent": {
+    "description": "टिप्पणी जोड़ने के बारे में जानकारी"
+  },
+  "present": "उपस्थित",
+  "@present": {
+    "description": "उपस्थित स्थिति के लिए लेबल"
+  },
+  "absent": "अनुपस्थित",
+  "@absent": {
+    "description": "अनुपस्थित स्थिति के लिए लेबल"
+  },
+  "remark": "टिप्पणी",
+  "@remark": {
+    "description": "टिप्पणी फील्ड के लिए लेबल"
+  },
+  "tapToAddRemark": "टिप्पणी जोड़ने के लिए टैप करें...",
+  "@tapToAddRemark": {
+    "description": "टिप्पणी जोड़ने के लिए प्लेसहोल्डर टेक्स्ट"
+  },
+  "rollNumber": "रोल नं: {rollNo}",
+  "@rollNumber": {
+    "description": "छात्र रोल नंबर प्रदर्शन",
+    "placeholders": {
+      "rollNo": {
+        "type": "String",
+        "description": "छात्र का रोल नंबर"
+      }
+    }
+  },
+  "admissionNumber": "प्रवेश नं: {admissionNo}",
+  "@admissionNumber": {
+    "description": "छात्र प्रवेश संख्या प्रदर्शन",
+    "placeholders": {
+      "admissionNo": {
+        "type": "String",
+        "description": "छात्र का प्रवेश नंबर"
+      }
+    }
+  },
+  "fatherName": "पिता: {fatherName}",
+  "@fatherName": {
+    "description": "छात्र के पिता का नाम प्रदर्शन",
+    "placeholders": {
+      "fatherName": {
+        "type": "String",
+        "description": "छात्र के पिता का नाम"
+      }
+    }
+  },
+  "confirmAttendance": "उपस्थिति की पुष्टि करें",
+  "@confirmAttendance": {
+    "description": "उपस्थिति पुष्टि डायलॉग के लिए शीर्षक"
+  },
+  "markStudentAs": "{studentName} को {status} के रूप में चिह्नित करें?",
+  "@markStudentAs": {
+    "description": "उपस्थिति चिह्नित करने के लिए पुष्टि संदेश",
+    "placeholders": {
+      "studentName": {
+        "type": "String",
+        "description": "छात्र का नाम"
+      },
+      "status": {
+        "type": "String",
+        "description": "उपस्थित या अनुपस्थित"
+      }
+    }
+  },
+  "canAddRemarkForStudent": "आप इस छात्र के लिए टिप्पणी जोड़ सकते हैं",
+  "@canAddRemarkForStudent": {
+    "description": "पुष्टि डायलॉग में टिप्पणी जोड़ने के बारे में जानकारी"
+  },
+  "markPresent": "उपस्थित चिह्नित करें",
+  "@markPresent": {
+    "description": "उपस्थित चिह्नित करने के लिए बटन टेक्स्ट"
+  },
+  "markAbsent": "अनुपस्थित चिह्नित करें",
+  "@markAbsent": {
+    "description": "अनुपस्थित चिह्नित करने के लिए बटन टेक्स्ट"
+  },
+  "addRemark": "टिप्पणी जोड़ें",
+  "@addRemark": {
+    "description": "टिप्पणी जोड़ने वाले डायलॉग के लिए शीर्षक"
+  },
+  "studentLabel": "छात्र: {studentName}",
+  "@studentLabel": {
+    "description": "छात्र का नाम दिखाने वाला लेबल",
+    "placeholders": {
+      "studentName": {
+        "type": "String",
+        "description": "छात्र का नाम"
+      }
+    }
+  },
+  "enterRemarkForStudent": "इस छात्र के लिए टिप्पणी दर्ज करें...",
+  "@enterRemarkForStudent": {
+    "description": "टिप्पणी इनपुट के लिए प्लेसहोल्डर"
+  },
+  "save": "सहेजें",
+  "@save": {
+    "description": "सहेजने के लिए बटन टेक्स्ट"
+  },
+  "attendanceMarkedSuccessfully": "उपस्थिति सफलतापूर्वक चिह्नित की गई!",
+  "@attendanceMarkedSuccessfully": {
+    "description": "उपस्थिति चिह्नित करने के लिए सफलता संदेश"
+  },
+  "attendanceMarkedWithRemarks": "उपस्थिति सफलतापूर्वक चिह्नित की गई! ({count} टिप्पणियां सहेजी गईं)",
+  "@attendanceMarkedWithRemarks": {
+    "description": "टिप्पणी संख्या के साथ सफलता संदेश",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "description": "सहेजी गई टिप्पणियों की संख्या"
+      }
+    }
+  },
+  "attendanceAlreadyMarkedToday": "आज इस कक्षा के लिए उपस्थिति पहले से चिह्नित है",
+  "@attendanceAlreadyMarkedToday": {
+    "description": "जब आज की उपस्थिति पहले से चिह्नित हो तो संदेश"
+  },
+  "notWorkingDayForClass": "आज इस कक्षा के लिए कार्य दिवस नहीं है",
+  "@notWorkingDayForClass": {
+    "description": "जब कार्य दिवस नहीं हो तो संदेश"
+  },
+  "markAttendance": "उपस्थिति चिह्नित करें",
+  "@markAttendance": {
+    "description": "उपस्थिति चिह्नित करने के लिए बटन टेक्स्ट"
+  },
+  "notWorkingDay": "कार्य दिवस नहीं",
+  "@notWorkingDay": {
+    "description": "जब कार्य दिवस नहीं हो तो बटन टेक्स्ट"
+  },
+  "saving": "सहेज रहे हैं...",
+  "@saving": {
+    "description": "सहेजते समय दिखाया जाने वाला टेक्स्ट"
+  },
+  "failedToSaveAttendance": "उपस्थिति सहेजने में विफल",
+  "@failedToSaveAttendance": {
+    "description": "सहेजने में विफल होने पर त्रुटि संदेश"
+  },
+  "cannotMarkAttendanceNonWorking": "गैर-कार्य दिवस पर उपस्थिति चिह्नित नहीं की जा सकती",
+  "@cannotMarkAttendanceNonWorking": {
+    "description": "गैर-कार्य दिवस पर उपस्थिति चिह्नित करने की कोशिश करने पर त्रुटि"
+  },
+  "attendanceAlreadyMarkedForClassToday": "इस कक्षा के लिए आज उपस्थिति पहले से चिह्नित है",
+  "@attendanceAlreadyMarkedForClassToday": {
+    "description": "आज की उपस्थिति पहले से चिह्नित होने का संदेश"
+  },
+  "authTokenNotFound": "प्रमाणीकरण टोकन नहीं मिला",
+  "@authTokenNotFound": {
+    "description": "प्रमाणीकरण टोकन नहीं मिलने पर त्रुटि"
+  },
+  "attendanceMarkedSuccessfullyWithRemarks": "उपस्थिति सफलतापूर्वक चिह्नित की गई! ({count} टिप्पणियां सहेजी गईं)",
+  "@attendanceMarkedSuccessfullyWithRemarks": {
+    "description": "टिप्पणी संख्या के साथ सफलता संदेश",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "description": "सहेजी गई टिप्पणियों की संख्या"
+      }
+    }
+  },
+  "markText": "मार्क करें",
+  "@markText": {
+    "description": "मार्क करने का शब्द"
+  },
+  "asText": "के रूप में",
+  "@asText": {
+    "description": "के रूप में शब्द"
+  },
+  "questionMark": "?",
+  "@questionMark": {
+    "description": "प्रश्न चिह्न"
+  },
+  "todayNotWorkingDayForClass": "आज इस कक्षा के लिए कार्य दिवस नहीं है",
+  "@todayNotWorkingDayForClass": {
+    "description": "आज कार्य दिवस नहीं होने पर संदेश"
+  },
+  "attendanceAlreadyMarkedButton": "उपस्थिति पहले से मार्क्ड",
+  "@attendanceAlreadyMarkedButton": {
+    "description": "उपस्थिति पहले से मार्क्ड होने पर बटन टेक्स्ट"
+  },
+  "notWorkingDayButton": "कार्य दिवस नहीं",
+  "@notWorkingDayButton": {
+    "description": "गैर-कार्य दिवस के लिए बटन टेक्स्ट"
+  },
+  "markAttendanceButton": "उपस्थिति चिह्नित करें",
+  "@markAttendanceButton": {
+    "description": "उपस्थिति चिह्नित करने के लिए बटन टेक्स्ट"
+  },
+  "unknownError": "अज्ञात त्रुटि",
+  "@unknownError": {
+    "description": "अज्ञात त्रुटि का फॉलबैक संदेश"
+  },
+  "canAddRemarksAsNeeded": "आप आवश्यकतानुसार टिप्पणियां जोड़ सकते हैं",
+  "@canAddRemarksAsNeeded": {
+    "description": "आवश्यकतानुसार टिप्पणियां जोड़ने की क्षमता के बारे में जानकारी"
+  },
+  "todayNotWorkingDayClass": "आज इस कक्षा के लिए कार्य दिवस नहीं है",
+  "@todayNotWorkingDayClass": {
+    "description": "जब आज कक्षा के लिए कार्य दिवस नहीं हो तो संदेश"
+  },
+  "attendanceInfoNotAvailable": "उपस्थिति की जानकारी उपलब्ध नहीं है",
+  "@attendanceInfoNotAvailable": {
+    "description": "जब चयनित तारीख के लिए उपस्थिति रिकॉर्ड उपलब्ध नहीं है तो दिखाया जाने वाला संदेश"
+  },
+  "selectChild": "बच्चे का चयन करें",
+  "@selectChild": {
+    "description": "ड्रॉपडाउन से बच्चे का चयन करने के लिए टेक्स्ट प्रॉम्प्ट"
+  },
+  "remarks": "टिप्पणियाँ",
+  "@remarks": {
+    "description": "टिप्पणियों के लिए लेबल"
+  },
+  "classLabel": "कक्षा",
+  "@classLabel": {
+    "description": "कक्षा के लिए लेबल"
+  },
+  "studentId": "छात्र आईडी",
+  "@studentId": {
+    "description": "छात्र आईडी के लिए लेबल"
+  },
+  "failedToLoadChildren": "बच्चों को लोड करने में असफल",
+  "@failedToLoadChildren": {
+    "description": "बच्चों को लोड करने में असफल होने पर त्रुटि संदेश"
+  },
+  "failedToLoadAttendanceRecords": "उपस्थिति रिकॉर्ड लोड करने में असफल",
+  "@failedToLoadAttendanceRecords": {
+    "description": "उपस्थिति रिकॉर्ड लोड करने में असफल होने पर त्रुटि संदेश"
+  },
+  "failedToLoadAttendanceData": "उपस्थिति डेटा लोड करने में असफल",
+  "@failedToLoadAttendanceData": {
+    "description": "उपस्थिति डेटा लोड करने में असफल होने पर त्रुटि संदेश"
+  },
+  "authenticationTokenNotFound": "प्रमाणीकरण टोकन नहीं मिला",
+  "@authenticationTokenNotFound": {
+    "description": "प्रमाणीकरण टोकन नहीं मिलने पर त्रुटि संदेश"
+  },
+  "daysPresent": "{present}/{total} दिन उपस्थित",
+  "@daysPresent": {
+    "description": "उपस्थित दिनों का प्रारूप",
+    "placeholders": {
+      "present": {
+        "type": "int",
+        "description": "उपस्थित दिनों की संख्या"
+      },
+      "total": {
+        "type": "int",
+        "description": "कुल दिनों की संख्या"
+      }
+    }
+  },
+  "address": "पता",
+  "@address": {
+    "description": "पते के लिए लेबल"
+  },
+  "email": "ईमेल",
+  "@email": {
+    "description": "ईमेल के लिए लेबल"
+  },
+  "phoneNumbers": "फोन नंबर",
+  "@phoneNumbers": {
+    "description": "फोन नंबर के लिए लेबल"
+  },
+  "selectAClass": "एक कक्षा चुनें",
+  "@selectAClass": {
+    "description": "कक्षा चुनने के लिए प्रॉम्प्ट टेक्स्ट"
+  },
+  "sunday": "रवि",
+  "@sunday": {
+    "description": "संक्षिप्त रविवार"
+  },
+  "monday": "सोम",
+  "@monday": {
+    "description": "संक्षिप्त सोमवार"
+  },
+  "tuesday": "मंगल",
+  "@tuesday": {
+    "description": "संक्षिप्त मंगलवार"
+  },
+  "wednesday": "बुध",
+  "@wednesday": {
+    "description": "संक्षिप्त बुधवार"
+  },
+  "thursday": "गुरु",
+  "@thursday": {
+    "description": "संक्षिप्त गुरुवार"
+  },
+  "friday": "शुक्र",
+  "@friday": {
+    "description": "संक्षिप्त शुक्रवार"
+  },
+  "saturday": "शनि",
+  "@saturday": {
+    "description": "संक्षिप्त शनिवार"
+  },
+  "january": "जनवरी",
+  "@january": {
+    "description": "जनवरी महीने का नाम"
+  },
+  "february": "फरवरी",
+  "@february": {
+    "description": "फरवरी महीने का नाम"
+  },
+  "march": "मार्च",
+  "@march": {
+    "description": "मार्च महीने का नाम"
+  },
+  "april": "अप्रैल",
+  "@april": {
+    "description": "अप्रैल महीने का नाम"
+  },
+  "may": "मई",
+  "@may": {
+    "description": "मई महीने का नाम"
+  },
+  "june": "जून",
+  "@june": {
+    "description": "जून महीने का नाम"
+  },
+  "july": "जुलाई",
+  "@july": {
+    "description": "जुलाई महीने का नाम"
+  },
+  "august": "अगस्त",
+  "@august": {
+    "description": "अगस्त महीने का नाम"
+  },
+  "september": "सितंबर",
+  "@september": {
+    "description": "सितंबर महीने का नाम"
+  },
+  "october": "अक्टूबर",
+  "@october": {
+    "description": "अक्टूबर महीने का नाम"
+  },
+  "november": "नवंबर",
+  "@november": {
+    "description": "नवंबर महीने का नाम"
+  },
+  "december": "दिसंबर",
+  "@december": {
+    "description": "दिसंबर महीने का नाम"
+  },
+  "petrasoftSolutions": "पेट्रासॉफ्ट सॉल्यूशंस",
+  "@petrasoftSolutions": {
+    "description": "कंपनी का नाम"
+  },
+  "unknownClass": "अज्ञात कक्षा",
+  "@unknownClass": {
+    "description": "जब कक्षा की जानकारी उपलब्ध न हो"
+  },
+  "couldNotOpenAppSettings": "ऐप सेटिंग्स नहीं खोल सका",
+  "@couldNotOpenAppSettings": {
+    "description": "ऐप सेटिंग्स खोलने में विफलता का संदेश"
+  },
+  "calendarTitle": "कैलेंडर",
+  "@calendarTitle": {
+    "description": "कैलेंडर स्क्रीन का शीर्षक"
+  },
+  "calendarDayDetailsPlaceholder": "विवरण देखने के लिए एक तारीख चुनें",
+  "@calendarDayDetailsPlaceholder": {
+    "description": "कैलेंडर में कोई तारीख नहीं चुनी गई है तो प्लेसहोल्डर टेक्स्ट"
+  },
+  "calendarHolidayLabel": "छुट्टी",
+  "@calendarHolidayLabel": {
+    "description": "कैलेंडर में छुट्टी के दिनों के लिए लेबल"
+  },
+  "calendarWorkingDayLabel": "कार्य दिवस",
+  "@calendarWorkingDayLabel": {
+    "description": "कैलेंडर में कार्य दिवसों के लिए लेबल"
+  },
+  "calendarLastUpdated": "अंतिम अपडेट: {date}",
+  "@calendarLastUpdated": {
+    "description": "कैलेंडर अंतिम बार कब अपडेट हुआ था यह दिखाने वाला टेक्स्ट",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "description": "अंतिम अपडेट की तारीख"
+      }
+    }
+  },
+  "calendarLoadError": "कैलेंडर डेटा लोड करने में विफल। कृपया पुन: प्रयास करें।",
+  "@calendarLoadError": {
+    "description": "कैलेंडर डेटा लोड करने में विफल होने पर त्रुटि संदेश"
+  },
+  "notices": "सूचनाएं",
+  "noNotices": "कोई सूचना उपलब्ध नहीं है",
+  "category": "श्रेणी",
+  "allCategories": "सभी श्रेणियां",
+  "noNoticesInCategory": "इस श्रेणी में कोई सूचना नहीं है",
+  "newLabel": "नया",
+  "retry": "पुनः प्रयास करें",
+  "@@locale": "hi",
+  "attendanceAlertTitle": "उपस्थिति अलर्ट",
+  "attendanceAlertStudent": "छात्र",
+  "attendanceAlertMarkedBy": "द्वारा चिह्नित",
+  "attendanceAlertMarkedTime": "समय",
+  "attendanceAlertNoData": "कोई उपस्थिति अलर्ट डेटा उपलब्ध नहीं है",
+  "reviewAttendanceButton": "उपस्थिति की समीक्षा करें",
+  "refreshCalendarTooltip": "कैलेंडर रीफ्रेश करें",
+  "@refreshCalendarTooltip": {
+    "description": "कैलेंडर रीफ्रेश आइकन बटन के लिए टूलटिप"
+  },
+  "regularWorkingDay": "नियमित कार्य दिवस",
+  "@regularWorkingDay": {
+    "description": "कैलेंडर विवरण में एक नियमित कार्य दिवस का संकेत देने वाला पाठ"
+  },
+  "reasonLabel": "कारण: ",
+  "@reasonLabel": {
+    "description": "छुट्टी के कारण पाठ के लिए लेबल"
+  }
+}

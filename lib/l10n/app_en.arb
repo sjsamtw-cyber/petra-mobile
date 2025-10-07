@@ -1,0 +1,793 @@
+{
+  "drawerHomeMenuTitle": "Home",
+  "@drawerHomeMenuTitle": {
+    "description": "The title of the drawer home menu"
+  },
+  "welcomeMessage": "Enabling schools to guide the diamonds of tomorrow for a better future",
+  "@welcomeMessage": {
+    "description": "A welcome message displayed on the home screen"
+  },
+  "loginTitle": "Login",
+  "@loginTitle": {
+    "description": "Title for the login screen"
+  },
+  "loginButton": "Login",
+  "@loginButton": {
+    "description": "Text for the login button"
+  },
+  "loginFailedMessage": "Login failed. Please try again.",
+  "@loginFailedMessage": {
+    "description": "Message displayed when login fails"
+  },
+  "usernameLabel": "Username",
+  "@usernameLabel": {
+    "description": "Label for the username field"
+  },
+  "passwordLabel": "Password",
+  "@passwordLabel": {
+    "description": "Label for the password field"
+  },
+  "usernameRequiredError": "Please enter your username",
+  "@usernameRequiredError": {
+    "description": "Error message when username is not entered"
+  },
+  "passwordRequiredError": "Please enter your password",
+  "@passwordRequiredError": {
+    "description": "Error message when password is not entered"
+  },
+  "registerButton": "Register",
+  "@registerButton": {
+    "description": "Text for the register button"
+  },
+  "switchSchoolButton": "Switch school",
+  "@switchSchoolButton": {
+    "description": "Text for the switch school button"
+  },
+  "registrationNotImplemented": "Registration not implemented yet",
+  "@registrationNotImplemented": {
+    "description": "Message when registration is not implemented"
+  },
+  "enableNotifications": "Enable Notifications",
+  "@enableNotifications": {
+    "description": "Title of the dialog that asks users to enable notifications"
+  },
+  "notificationPermissionMessage": "Please enable notifications for the app to work properly.",
+  "@notificationPermissionMessage": {
+    "description": "Message explaining why notifications are needed"
+  },
+  "openSettings": "Open Settings",
+  "@openSettings": {
+    "description": "Button text to open device settings"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Generic cancel button text"
+  },
+  "updateAvailable": "Update Available",
+  "@updateAvailable": {
+    "description": "Title of the dialog that informs about app updates"
+  },
+  "updateMessage": "Please update the app to the latest version for the best experience.",
+  "@updateMessage": {
+    "description": "Message explaining why the app should be updated"
+  },
+  "update": "Update",
+  "@update": {
+    "description": "Button text to trigger app update"
+  },
+  "enterSchoolCodeTitle": "Enter school code",
+  "@enterSchoolCodeTitle": {
+    "description": "Title for the school code entry screen"
+  },
+  "schoolCodeLabel": "School Code",
+  "@schoolCodeLabel": {
+    "description": "Label for the school code input field"
+  },
+  "schoolCodeRequiredError": "School code is required.",
+  "@schoolCodeRequiredError": {
+    "description": "Error message when school code is not entered"
+  },
+  "submitButton": "Submit",
+  "@submitButton": {
+    "description": "Text for the submit button"
+  },
+  "invalidSchoolCode": "Invalid school code.",
+  "@invalidSchoolCode": {
+    "description": "Error message for an invalid school code"
+  },
+  "notAPartOfFamilyText": "Not a part of the Petrasoft family yet ?",
+  "@notAPartOfFamilyText": {
+    "description": "Text displayed above the 'Join us today' button"
+  },
+  "dayDetailsTitle": "Day Details",
+  "@dayDetailsTitle": {
+    "description": "Title for the day details view"
+  },
+  "joinUsTodayButton": "Join us today",
+  "@joinUsTodayButton": {
+    "description": "Text for the 'Join us today' button"
+  },
+  "petrasoftSolutionsText": "Petrasoft Solutions",
+  "@petrasoftSolutionsText": {
+    "description": "Text displayed below the company logo"
+  },
+  "errorValidatingCode": "Error validating code. Please try again.",
+  "@errorValidatingCode": {
+    "description": "Generic error message when validating school code fails"
+  },
+  "couldNotOpenLink": "Could not open the link.",
+  "@couldNotOpenLink": {
+    "description": "Error message when URL cannot be launched"
+  },
+  "drawerSchoolCodeTitle": "School Code",
+  "@drawerSchoolCodeTitle": {
+    "description": "The title of the drawer school code menu item"
+  },
+  "drawerAboutTitle": "About",
+  "@drawerAboutTitle": {
+    "description": "The title of the drawer about menu item"
+  },
+  "drawerErrorTitle": "Error",
+  "@drawerErrorTitle": {
+    "description": "The title of the drawer error menu item (for testing)"
+  },
+  "loadingText": "Loading...",
+  "@loadingText": {
+    "description": "Text displayed during loading operations"
+  },
+  "settingsTitle": "Settings",
+  "@settingsTitle": {
+    "description": "Title for the settings screen"
+  },
+  "themeText": "Theme",
+  "@themeText": {
+    "description": "Label for theme section in settings"
+  },
+  "lightModeText": "Light Mode",
+  "@lightModeText": {
+    "description": "Text for light mode theme option"
+  },
+  "darkModeText": "Dark Mode",
+  "@darkModeText": {
+    "description": "Text for dark mode theme option"
+  },
+  "preferencesText": "Preferences",
+  "@preferencesText": {
+    "description": "Label for preferences section in settings"
+  },
+  "notificationsText": "Notifications",
+  "@notificationsText": {
+    "description": "Label for notifications option in settings"
+  },
+  "languageText": "Language",
+  "@languageText": {
+    "description": "Label for language option in settings"
+  },
+  "informationText": "Information",
+  "@informationText": {
+    "description": "Label for information section in settings"
+  },
+  "aboutUsText": "About Us",
+  "@aboutUsText": {
+    "description": "Label for about us option in settings"
+  },
+  "privacyPolicyText": "Privacy Policy",
+  "@privacyPolicyText": {
+    "description": "Label for privacy policy option in settings"
+  },
+  "getHelpText": "Get Help",
+  "@getHelpText": {
+    "description": "Label for get help option in settings"
+  },
+  "accountText": "Account",
+  "@accountText": {
+    "description": "Label for account section in settings"
+  },
+  "switchSchoolText": "Switch School",
+  "@switchSchoolText": {
+    "description": "Label for switch school option in settings"
+  },
+  "signOutText": "Sign Out",
+  "@signOutText": {
+    "description": "Label for sign out option in settings"
+  },
+  "languageHumanReadableName": "English",
+  "@languageHumanReadableName": {
+    "description": "Human readable name of the current language"
+  },
+  "dashboardWelcome": "Welcome {name}",
+  "@dashboardWelcome": {
+    "description": "Welcome message on dashboard with user name",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Eva"
+      }
+    }
+  },
+  "markAttendanceText": "Mark\nAttendance",
+  "@markAttendanceText": {
+    "description": "Label for mark attendance button on dashboard"
+  },
+  "reviewAttendanceText": "Review\nAttendance",
+  "@reviewAttendanceText": {
+    "description": "Label for review attendance button on dashboard"
+  },
+  "attendancePercentageText": "Attendance\nPercentage",
+  "@attendancePercentageText": {
+    "description": "Label for attendance percentage button on dashboard"
+  },
+  "markAttendanceTitle": "Mark Attendance",
+  "@markAttendanceTitle": {
+    "description": "Title for mark attendance page"
+  },
+  "reviewAttendanceTitle": "Review Attendance",
+  "@reviewAttendanceTitle": {
+    "description": "Title for review attendance page"
+  },
+  "attendancePercentageTitle": "Attendance Percentage",
+  "@attendancePercentageTitle": {
+    "description": "Title for attendance percentage page"
+  },
+  "noticeBoardText": "Notice\nBoard",
+  "@noticeBoardText": {
+    "description": "Label for notice board button on dashboard"
+  },
+  "busTrackingText": "Bus\nTracking",
+  "@busTrackingText": {
+    "description": "Label for bus tracking button on dashboard"
+  },
+  "calendarText": "Calendar",
+  "@calendarText": {
+    "description": "Label for calendar button on dashboard"
+  },
+  "month": "Month",
+  "@month": {
+    "description": "Label for month selector in calendar"
+  },
+  "selectClass": "Select Class",
+  "@selectClass": {
+    "description": "Label for class selector dropdown"
+  },
+  "noClassesAvailable": "No classes available",
+  "@noClassesAvailable": {
+    "description": "Message when no classes are available"
+  },
+  "pleaseLoginAgain": "Please login again",
+  "@pleaseLoginAgain": {
+    "description": "Message when user needs to login again"
+  },
+  "failedToLoadClasses": "Failed to load classes. Please try again.",
+  "@failedToLoadClasses": {
+    "description": "Error message when loading classes fails"
+  },
+  "errorLoadingClasses": "Error loading classes",
+  "@errorLoadingClasses": {
+    "description": "Generic error message for class loading"
+  },
+  "pleaseSelectClassFirst": "Please select a class first",
+  "@pleaseSelectClassFirst": {
+    "description": "Message when no class is selected"
+  },
+  "noStudentsFoundInClass": "No students found in this class",
+  "@noStudentsFoundInClass": {
+    "description": "Message when class has no students"
+  },
+  "notWorkingDayFor": "Today is not a working day for {className}",
+  "@notWorkingDayFor": {
+    "description": "Message when today is not a working day",
+    "placeholders": {
+      "className": {
+        "type": "String",
+        "description": "The name of the class"
+      }
+    }
+  },
+  "attendanceAlreadyMarked": "Attendance Already Marked",
+  "@attendanceAlreadyMarked": {
+    "description": "Message when attendance is already marked"
+  },
+  "attendanceAlreadyMarkedFor": "Attendance has already been marked for {className} today. If you need to make changes, please use the web interface.",
+  "@attendanceAlreadyMarkedFor": {
+    "description": "Detailed message when attendance is already marked",
+    "placeholders": {
+      "className": {
+        "type": "String",
+        "description": "The name of the class"
+      }
+    }
+  },
+  "viewHistoricalAttendance": "View Historical Attendance",
+  "@viewHistoricalAttendance": {
+    "description": "Button text for viewing historical attendance"
+  },
+  "selectDate": "Select Date",
+  "@selectDate": {
+    "description": "Header for date selection"
+  },
+  "studentsCount": "Students ({count})",
+  "@studentsCount": {
+    "description": "Header showing student count",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "description": "Number of students"
+      }
+    }
+  },
+  "presentCount": "Present: {count}",
+  "@presentCount": {
+    "description": "Count of present students",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "description": "Number of present students"
+      }
+    }
+  },
+  "absentCount": "Absent: {count}",
+  "@absentCount": {
+    "description": "Count of absent students",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "description": "Number of absent students"
+      }
+    }
+  },
+  "considerAddingRemarksForAbsent": "Consider adding remarks for absent students",
+  "@considerAddingRemarksForAbsent": {
+    "description": "Suggestion to add remarks for absent students"
+  },
+  "canAddRemarksForAnyStudent": "You can add remarks for any student as needed",
+  "@canAddRemarksForAnyStudent": {
+    "description": "Info about adding remarks"
+  },
+  "present": "Present",
+  "@present": {
+    "description": "Label for present status"
+  },
+  "absent": "Absent",
+  "@absent": {
+    "description": "Label for absent status"
+  },
+  "remark": "Remark",
+  "@remark": {
+    "description": "Label for remark field"
+  },
+  "tapToAddRemark": "Tap to add remark...",
+  "@tapToAddRemark": {
+    "description": "Placeholder text for adding remark"
+  },
+  "confirmAttendance": "Confirm Attendance",
+  "@confirmAttendance": {
+    "description": "Title for attendance confirmation dialog"
+  },
+  "markStudentAs": "Mark {studentName} as {status}?",
+  "@markStudentAs": {
+    "description": "Confirmation message for marking attendance",
+    "placeholders": {
+      "studentName": {
+        "type": "String",
+        "description": "Name of the student"
+      },
+      "status": {
+        "type": "String",
+        "description": "Present or Absent"
+      }
+    }
+  },
+  "canAddRemarkForStudent": "You can add a remark for this student",
+  "@canAddRemarkForStudent": {
+    "description": "Info about adding remark in confirmation dialog"
+  },
+  "markPresent": "Mark Present",
+  "@markPresent": {
+    "description": "Button text for marking present"
+  },
+  "markAbsent": "Mark Absent",
+  "@markAbsent": {
+    "description": "Button text for marking absent"
+  },
+  "addRemark": "Add Remark",
+  "@addRemark": {
+    "description": "Title for add remark dialog"
+  },
+  "studentLabel": "Student: {studentName}",
+  "@studentLabel": {
+    "description": "Label showing student name",
+    "placeholders": {
+      "studentName": {
+        "type": "String",
+        "description": "Name of the student"
+      }
+    }
+  },
+  "enterRemarkForStudent": "Enter remark for this student...",
+  "@enterRemarkForStudent": {
+    "description": "Placeholder for remark input"
+  },
+  "save": "Save",
+  "@save": {
+    "description": "Save button text"
+  },
+  "attendanceMarkedSuccessfully": "Attendance marked successfully!",
+  "@attendanceMarkedSuccessfully": {
+    "description": "Success message for attendance marking"
+  },
+  "attendanceInfoNotAvailable": "Attendance information is not available",
+  "@attendanceInfoNotAvailable": {
+    "description": "Message shown when attendance record is not available for a selected date"
+  },
+  "selectChild": "Select Child",
+  "@selectChild": {
+    "description": "Text prompt to select a child from dropdown"
+  },
+  "attendanceMarkedWithRemarks": "Attendance marked successfully! ({count} remarks saved)",
+  "@attendanceMarkedWithRemarks": {
+    "description": "Success message with remark count",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "description": "Number of remarks saved"
+      }
+    }
+  },
+  "attendanceAlreadyMarkedToday": "Attendance has already been marked for this class today",
+  "@attendanceAlreadyMarkedToday": {
+    "description": "Message when attendance already marked today"
+  },
+  "notWorkingDayForClass": "Today is not a working day for this class",
+  "@notWorkingDayForClass": {
+    "description": "Message when not a working day"
+  },
+  "markAttendance": "Mark Attendance",
+  "@markAttendance": {
+    "description": "Button text for marking attendance"
+  },
+  "notWorkingDay": "Not a Working Day",
+  "@notWorkingDay": {
+    "description": "Button text when not working day"
+  },
+  "saving": "Saving...",
+  "@saving": {
+    "description": "Text shown while saving"
+  },
+  "failedToSaveAttendance": "Failed to save attendance",
+  "@failedToSaveAttendance": {
+    "description": "Error message when saving fails"
+  },
+  "cannotMarkAttendanceNonWorking": "Cannot mark attendance on a non-working day",
+  "@cannotMarkAttendanceNonWorking": {
+    "description": "Error when trying to mark on non-working day"
+  },
+  "canAddRemarksAsNeeded": "You can add remarks for any student as needed",
+  "@canAddRemarksAsNeeded": {
+    "description": "Info about adding remarks for any student"
+  },
+  "todayNotWorkingDayClass": "Today is not a working day for this class",
+  "@todayNotWorkingDayClass": {
+    "description": "Message when today is not a working day"
+  },
+  "attendanceAlreadyMarkedButton": "Attendance Already Marked",
+  "@attendanceAlreadyMarkedButton": {
+    "description": "Button text when attendance is already marked"
+  },
+  "notWorkingDayButton": "Not a Working Day",
+  "@notWorkingDayButton": {
+    "description": "Button text for non-working day"
+  },
+  "markAttendanceButton": "Mark Attendance",
+  "@markAttendanceButton": {
+    "description": "Button text for marking attendance"
+  },
+  "rollNumber": "Roll No: {rollNo}",
+  "@rollNumber": {
+    "description": "Student roll number display",
+    "placeholders": {
+      "rollNo": {
+        "type": "String",
+        "description": "Student roll number"
+      }
+    }
+  },
+  "admissionNumber": "Admission No: {admissionNo}",
+  "@admissionNumber": {
+    "description": "Student admission number display",
+    "placeholders": {
+      "admissionNo": {
+        "type": "String",
+        "description": "Student admission number"
+      }
+    }
+  },
+  "fatherName": "Father: {fatherName}",
+  "@fatherName": {
+    "description": "Student father name display",
+    "placeholders": {
+      "fatherName": {
+        "type": "String",
+        "description": "Student father name"
+      }
+    }
+  },
+  "authTokenNotFound": "Authentication token not found",
+  "@authTokenNotFound": {
+    "description": "Error when authentication token is not found"
+  },
+  "attendanceAlreadyMarkedForClassToday": "Attendance has already been marked for this class today",
+  "@attendanceAlreadyMarkedForClassToday": {
+    "description": "Message when attendance already marked today"
+  },
+  "attendanceMarkedSuccessfullyWithRemarks": "Attendance marked successfully! ({count} remarks saved)",
+  "@attendanceMarkedSuccessfullyWithRemarks": {
+    "description": "Success message with remark count",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "description": "Number of remarks saved"
+      }
+    }
+  },
+  "markText": "Mark",
+  "@markText": {
+    "description": "Mark text"
+  },
+  "asText": "as",
+  "@asText": {
+    "description": "As text"
+  },
+  "questionMark": "?",
+  "@questionMark": {
+    "description": "Question mark"
+  },
+  "todayNotWorkingDayForClass": "Today is not a working day for this class",
+  "@todayNotWorkingDayForClass": {
+    "description": "Message when today is not a working day"
+  },
+  "unknownError": "Unknown error",
+  "@unknownError": {
+    "description": "Fallback error message when error type is unknown"
+  },
+  "remarks": "Remarks",
+  "@remarks": {
+    "description": "Label for remarks"
+  },
+  "classLabel": "Class",
+  "@classLabel": {
+    "description": "Label for class"
+  },
+  "studentId": "Student ID",
+  "@studentId": {
+    "description": "Label for student ID"
+  },
+  "failedToLoadChildren": "Failed to load children",
+  "@failedToLoadChildren": {
+    "description": "Error message for failed to load children"
+  },
+  "failedToLoadAttendanceRecords": "Failed to load attendance records",
+  "@failedToLoadAttendanceRecords": {
+    "description": "Error message for failed to load attendance records"
+  },
+  "failedToLoadAttendanceData": "Failed to load attendance data",
+  "@failedToLoadAttendanceData": {
+    "description": "Error message for failed to load attendance data"
+  },
+  "authenticationTokenNotFound": "Authentication token not found",
+  "@authenticationTokenNotFound": {
+    "description": "Error message for authentication token not found"
+  },
+  "daysPresent": "{present}/{total} days present",
+  "@daysPresent": {
+    "description": "Days present format",
+    "placeholders": {
+      "present": {
+        "type": "int",
+        "description": "Number of days present"
+      },
+      "total": {
+        "type": "int",
+        "description": "Total number of days"
+      }
+    }
+  },
+  "january": "January",
+  "@january": {
+    "description": "Month name January"
+  },
+  "february": "February",
+  "@february": {
+    "description": "Month name February"
+  },
+  "march": "March",
+  "@march": {
+    "description": "Month name March"
+  },
+  "april": "April",
+  "@april": {
+    "description": "Month name April"
+  },
+  "may": "May",
+  "@may": {
+    "description": "Month name May"
+  },
+  "june": "June",
+  "@june": {
+    "description": "Month name June"
+  },
+  "july": "July",
+  "@july": {
+    "description": "Month name July"
+  },
+  "august": "August",
+  "@august": {
+    "description": "Month name August"
+  },
+  "september": "September",
+  "@september": {
+    "description": "Month name September"
+  },
+  "october": "October",
+  "@october": {
+    "description": "Month name October"
+  },
+  "november": "November",
+  "@november": {
+    "description": "Month name November"
+  },
+  "december": "December",
+  "@december": {
+    "description": "Month name December"
+  },
+  "address": "Address",
+  "@address": {
+    "description": "Label for address"
+  },
+  "email": "Email",
+  "@email": {
+    "description": "Label for email"
+  },
+  "phoneNumbers": "Phone Numbers",
+  "@phoneNumbers": {
+    "description": "Label for phone numbers"
+  },
+  "petrasoftSolutions": "Petrasoft Solutions",
+  "@petrasoftSolutions": {
+    "description": "Company name"
+  },
+  "selectAClass": "Select a class",
+  "@selectAClass": {
+    "description": "Hint text for class selection dropdown"
+  },
+  "unknownClass": "Unknown Class",
+  "@unknownClass": {
+    "description": "Fallback text for unknown class name"
+  },
+  "couldNotOpenAppSettings": "Could not open app settings",
+  "@couldNotOpenAppSettings": {
+    "description": "Error message when app settings cannot be opened"
+  },
+  "sunday": "Sun",
+  "@sunday": {
+    "description": "Abbreviated Sunday"
+  },
+  "monday": "Mon",
+  "@monday": {
+    "description": "Abbreviated Monday"
+  },
+  "tuesday": "Tue",
+  "@tuesday": {
+    "description": "Abbreviated Tuesday"
+  },
+  "wednesday": "Wed",
+  "@wednesday": {
+    "description": "Abbreviated Wednesday"
+  },
+  "thursday": "Thu",
+  "@thursday": {
+    "description": "Abbreviated Thursday"
+  },
+  "friday": "Fri",
+  "@friday": {
+    "description": "Abbreviated Friday"
+  },
+  "saturday": "Sat",
+  "@saturday": {
+    "description": "Abbreviated Saturday"
+  },
+  "calendarTitle": "Calendar",
+  "@calendarTitle": {
+    "description": "Title for the calendar screen"
+  },
+  "calendarDayDetailsPlaceholder": "Select a date to view details",
+  "@calendarDayDetailsPlaceholder": {
+    "description": "Placeholder text when no date is selected in calendar"
+  },
+  "calendarHolidayLabel": "Holiday",
+  "@calendarHolidayLabel": {
+    "description": "Label for holiday days in calendar"
+  },
+  "calendarWorkingDayLabel": "Working Day",
+  "@calendarWorkingDayLabel": {
+    "description": "Label for working days in calendar"
+  },
+  "calendarLastUpdated": "Last updated: {date}",
+  "@calendarLastUpdated": {
+    "description": "Text showing when calendar was last updated",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "description": "The last updated date"
+      }
+    }
+  },
+  "calendarLoadError": "Failed to load calendar data. Please try again.",
+  "@calendarLoadError": {
+    "description": "Error message when calendar data fails to load"
+  },
+  "notices": "Notices",
+  "@notices": {
+    "description": "Title for the notices screen"
+  },
+  "noNotices": "No notices available",
+  "@noNotices": {
+    "description": "Message shown when there are no notices to display"
+  },
+  "category": "Category",
+  "@category": {
+    "description": "Label for notice category dropdown"
+  },
+  "allCategories": "All Categories",
+  "@allCategories": {
+    "description": "Label for showing all notice categories"
+  },
+  "noNoticesInCategory": "No notices in this category",
+  "@noNoticesInCategory": {
+    "description": "Message shown when a category has no notices"
+  },
+  "newLabel": "New",
+  "@newLabel": {
+    "description": "Label shown on new notices"
+  },
+  "retry": "Try Again",
+  "@retry": {
+    "description": "Label for retry buttons"
+  },
+  "attendanceAlertTitle": "Attendance Alert",
+  "@attendanceAlertTitle": {
+    "description": "Title for attendance alert screen"
+  },
+  "attendanceAlertStudent": "Student",
+  "@attendanceAlertStudent": {
+    "description": "Label for student name in attendance alert"
+  },
+  "attendanceAlertMarkedBy": "Marked by",
+  "@attendanceAlertMarkedBy": {
+    "description": "Label for who marked the attendance"
+  },
+  "attendanceAlertMarkedTime": "Time",
+  "@attendanceAlertMarkedTime": {
+    "description": "Label for when attendance was marked"
+  },
+  "attendanceAlertNoData": "No attendance alert data available",
+  "@attendanceAlertNoData": {
+    "description": "Message shown when no attendance alert data is available"
+  },
+  "reviewAttendanceButton": "Review Attendance",
+  "@reviewAttendanceButton": {
+    "description": "Button text to review attendance details"
+  },
+  "refreshCalendarTooltip": "Refresh Calendar",
+  "@refreshCalendarTooltip": {
+    "description": "Tooltip for the refresh calendar icon button"
+  },
+  "regularWorkingDay": "Regular working day",
+  "@regularWorkingDay": {
+    "description": "Text indicating a regular working day in calendar details"
+  },
+  "reasonLabel": "Reason: ",
+  "@reasonLabel": {
+    "description": "Label for the holiday reason text"
+  },
+  "@@locale": "en"
+}

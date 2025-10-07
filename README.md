@@ -16,7 +16,7 @@ xcode-select --install
 
 Install _fastlane_ using bundler by following instructions here on [fastlane docs](https://docs.fastlane.tools).
 
-or alternatively using 
+or alternatively using
 
 `brew install fastlane`
 

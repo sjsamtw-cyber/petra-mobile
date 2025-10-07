@@ -1,0 +1,6 @@
+#include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"
+#include "Generated.xcconfig"
+
+ASSET_PREFIX=dev
+BUNDLE_NAME=(Dev) Petrasoft School Management Solutions
+BUNDLE_DISPLAY_NAME=(Dev) Petrasoft School Management Solutions

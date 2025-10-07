@@ -1,0 +1,14 @@
+default_platform(:android)
+
+platform :android do
+  desc "Build the Android app for a specific flavor."
+  lane :build do |options|
+    flavor = options[:flavor]
+    flutter_build(
+      platform: 'android',
+      flavor: flavor,
+      build_name: ENV['BUILD_NAME'],
+      build_number: ENV['BUILD_NUMBER']
+    )
+  end
+end

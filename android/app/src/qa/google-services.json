@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1051869953939",
+    "project_id": "petrasoft-qa",
+    "storage_bucket": "petrasoft-qa.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1051869953939:android:8fcba8b386ab6b567b7266",
+        "android_client_info": {
+          "package_name": "com.petrasoftsolutions.mobile.qa"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2jip2B6rxuK11t87Itr1Xztx-bqvPGLg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
