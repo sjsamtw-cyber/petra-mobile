@@ -1,0 +1,177 @@
+name: Flutter CI/CD
+
+on:
+  pull_request:
+    # run CI for pull requests targeting branch branches that start with `mobile-`
+    branches:
+      - "mobile-*"
+      - "main"
+  push:
+    # build when pushing to flavor branches like mobile-dev, mobile-qa, mobile-staging, mobile-prod
+    branches:
+      - "mobile-*"
+      - "main"
+
+jobs:
+  test:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Flutter
+        # pinned to a specific release for stability and security
+        uses: subosito/flutter-action@v2.21.0
+        with:
+          flutter-version: "3.x"
+          channel: "stable"
+          cache: true
+
+      - name: Cache pub dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.pub-cache
+          key: pub-cache-${{ runner.os }}-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            pub-cache-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: flutter pub get
+        working-directory: .
+
+      - name: Run static analysis
+        run: flutter analyze --fatal-infos
+        working-directory: .
+
+      - name: Run unit & widget tests
+        run: |
+          if [ -d "test" ]; then
+            flutter test --machine --coverage
+          else
+            echo "No test directory found, skipping unit tests"
+          fi
+        working-directory: .
+
+      - name: Upload test results and coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mobile-test-results-${{ github.run_number }}
+          path: |
+            coverage/
+          retention-days: 30
+
+  build:
+    needs: test
+    # Only run builds for:
+    # 1. Direct pushes to mobile-qa, mobile-staging, or mobile-prod (NOT mobile-dev)
+    # 2. PRs from same repo (not forks) where head branch is mobile-qa, mobile-staging, or mobile-prod
+    if: >
+      needs.test.result == 'success' &&
+      (
+        (github.event_name == 'push' &&
+         (github.ref == 'refs/heads/mobile-qa' ||
+          github.ref == 'refs/heads/mobile-staging' ||
+          github.ref == 'refs/heads/mobile-prod')
+        )
+        ||
+        (github.event_name == 'pull_request' &&
+         github.event.pull_request.head.repo.full_name == github.repository &&
+         (
+           github.event.pull_request.head.ref == 'mobile-qa' ||
+           github.event.pull_request.head.ref == 'mobile-staging' ||
+           github.event.pull_request.head.ref == 'mobile-prod'
+         )
+        )
+      )
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2.21.0
+        with:
+          flutter-version: "3.x"
+          channel: "stable"
+          cache: true
+
+      - name: Download test artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: mobile-test-results-${{ github.run_number }}
+          path: coverage/
+
+      - name: Determine flavor from branch
+        id: determine_flavor
+        run: |
+          # For pull_request events from forks, GITHUB_HEAD_REF is set
+          if [ -n "${GITHUB_HEAD_REF}" ]; then
+            BRANCH_NAME=${GITHUB_HEAD_REF}
+          else
+            BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          fi
+          echo "Branch detected: $BRANCH_NAME"
+          if [[ "$BRANCH_NAME" == "main" ]]; then
+            FLAV=dev
+          elif [[ "$BRANCH_NAME" =~ ^mobile-(dev|qa|staging|prod)$ ]]; then
+            FLAV=${BRANCH_NAME#mobile-}
+          else
+            echo "Branch name doesn't match main or mobile-<flavor>; defaulting to dev"
+            FLAV=dev
+          fi
+          echo "FLAVOR=$FLAV" >> $GITHUB_ENV
+          echo "flavor=$FLAV" >> $GITHUB_OUTPUT
+
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-cache-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-cache-${{ runner.os }}-
+
+      - name: Setup Fastlane (Android)
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "2.7"
+          bundler-cache: true
+
+      - name: Install Fastlane gems (Android)
+        run: |
+          cd android
+          if [ -f Gemfile ]; then
+            bundle install --jobs 4 --retry 3
+          fi
+
+      - name: Build Android (flavor from branch)
+        run: |
+          cd android
+          echo "Building Android flavor: $FLAVOR"
+          bundle exec fastlane build flavor:$FLAVOR
+        env:
+          BUILD_NAME: 1.0.0
+          BUILD_NUMBER: ${{ github.run_number }}
+
+      - name: Setup Fastlane (iOS)
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "2.7"
+          bundler-cache: true
+
+      - name: Install Fastlane gems (iOS)
+        run: |
+          cd ios
+          if [ -f Gemfile ]; then
+            bundle install --jobs 4 --retry 3
+          fi
+
+      - name: Build iOS (flavor from branch)
+        run: |
+          cd ios
+          echo "Building iOS flavor: $FLAVOR"
+          bundle exec fastlane build flavor:$FLAVOR
+        env:
+          BUILD_NAME: 1.0.0
+          BUILD_NUMBER: ${{ github.run_number }}
