@@ -1,14 +1,73 @@
 default_platform(:android)
 
 platform :android do
-  desc "Build the Android app for a specific flavor."
+  desc "Build the Android app for a specific flavor (signed release)"
   lane :build do |options|
     flavor = options[:flavor]
-    flutter_build(
-      platform: 'android',
+    
+    # Build signed release AAB with split debug info
+    gradle(
+      task: 'bundle',
       flavor: flavor,
-      build_name: ENV['BUILD_NAME'],
-      build_number: ENV['BUILD_NUMBER']
+      build_type: 'Release',
+      properties: {
+        "android.injected.signing.store.file" => ENV['KEYSTORE_FILE'],
+        "android.injected.signing.store.password" => ENV['KEYSTORE_PASSWORD'],
+        "android.injected.signing.key.alias" => ENV['KEY_ALIAS'],
+        "android.injected.signing.key.password" => ENV['KEY_PASSWORD'],
+      }
     )
+    
+    # Also generate mapping.txt for ProGuard/R8 (crash symbolication)
+    # The mapping file will be in app/build/outputs/mapping/<flavor>Release/mapping.txt
+  end
+
+  desc "Upload Android app to Google Play (Internal track for non-prod)"
+  lane :upload do |options|
+    flavor = options[:flavor]
+    
+    # Determine track based on flavor
+    track = flavor == 'prod' ? 'production' : 'internal'
+    
+    # Set up service account JSON
+    service_account_json = if flavor == 'prod'
+      ENV['GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_PROD']
+    elsif flavor == 'staging'
+      ENV['GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_STAGING']
+    elsif flavor == 'qa'
+      ENV['GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_QA']
+    else
+      nil
+    end
+    
+    if service_account_json.nil?
+      UI.user_error!("No service account JSON found for flavor: #{flavor}")
+    end
+    
+    # Write JSON to temp file
+    json_key_file = "/tmp/play-service-account-#{flavor}.json"
+    File.write(json_key_file, service_account_json)
+    
+    # Upload to Play Store
+    upload_to_play_store(
+      package_name: "com.petrasoftsolutions.mobile.#{flavor}",
+      track: track,
+      aab: "app/build/outputs/bundle/#{flavor}Release/app-#{flavor}-release.aab",
+      json_key: json_key_file,
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      mapping: "app/build/outputs/mapping/#{flavor}Release/mapping.txt"
+    )
+    
+    # Clean up temp file
+    File.delete(json_key_file) if File.exist?(json_key_file)
+  end
+
+  desc "Build and upload Android app"
+  lane :build_and_upload do |options|
+    build(options)
+    upload(options)
   end
 end

@@ -1,14 +1,90 @@
 default_platform(:ios)
 
 platform :ios do
-  desc "Build the iOS app for a specific flavor."
+  desc "Fetch certificates and provisioning profiles via Match"
+  lane :fetch_certificates do |options|
+    match_type = ENV['MATCH_TYPE'] || options[:type] || 'appstore'
+    
+    match(
+      type: match_type,
+      readonly: true,
+      keychain_name: "build.keychain",
+      keychain_password: ""
+    )
+  end
+
+  desc "Build the iOS app for a specific flavor (with signing)"
   lane :build do |options|
     flavor = options[:flavor]
-    flutter_build(
-      platform: 'ios',
-      flavor: flavor,
-      build_name: ENV['BUILD_NAME'],
-      build_number: ENV['BUILD_NUMBER']
+    
+    # Fetch certificates first
+    fetch_certificates
+    
+    # Determine scheme name from flavor
+    scheme_name = case flavor
+    when 'dev'
+      'dev'
+    when 'qa'
+      'qa'
+    when 'staging'
+      'staging'
+    when 'prod'
+      'prod'
+    else
+      'dev'
+    end
+    
+    # Build with xcodebuild (signed)
+    build_ios_app(
+      scheme: scheme_name,
+      configuration: "Release-#{flavor}",
+      export_method: ENV['MATCH_TYPE'] == 'appstore' ? 'app-store' : 'ad-hoc',
+      output_directory: "./build",
+      output_name: "Runner-#{flavor}.ipa",
+      export_options: {
+        method: ENV['MATCH_TYPE'] == 'appstore' ? 'app-store' : 'ad-hoc',
+        provisioningProfiles: {
+          "com.petrasoftsolutions.mobile.#{flavor}" => "match AdHoc com.petrasoftsolutions.mobile.#{flavor}"
+        }
+      },
+      # Split debug info for crash symbolication
+      include_symbols: true,
+      include_bitcode: false
     )
+  end
+
+  desc "Upload iOS app to TestFlight or App Store"
+  lane :upload do |options|
+    flavor = options[:flavor]
+    
+    # Authenticate with App Store Connect API
+    app_store_connect_api_key(
+      key_id: ENV['APP_STORE_CONNECT_KEY_ID'],
+      issuer_id: ENV['APP_STORE_CONNECT_ISSUER_ID'],
+      key_content: Base64.decode64(ENV['APP_STORE_CONNECT_API_KEY_BASE64']),
+      is_key_content_base64: false,
+      in_house: false
+    )
+    
+    if ENV['MATCH_TYPE'] == 'appstore'
+      # Upload to App Store / TestFlight (prod)
+      upload_to_testflight(
+        ipa: "./build/Runner-#{flavor}.ipa",
+        skip_waiting_for_build_processing: true
+      )
+    else
+      # For non-prod (adhoc), upload to TestFlight as beta
+      upload_to_testflight(
+        ipa: "./build/Runner-#{flavor}.ipa",
+        skip_waiting_for_build_processing: true,
+        distribute_external: false  # Internal testing only
+      )
+    end
+  end
+
+  desc "Build and upload iOS app"
+  lane :build_and_upload do |options|
+    build(options)
+    upload(options)
   end
 end
