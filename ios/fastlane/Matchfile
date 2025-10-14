@@ -5,4 +5,4 @@ storage_mode("git")
 
 type(ENV["MATCH_TYPE"] || "adhoc")
 
-app_identifier(["com.petrasoftsolutions.mobile.dev", "com.petrasoftsolutions.mobile.qa", "com.petrasoftsolutions.mobile.staging", "com.petrasoftsolutions.mobile.prod"])
+app_identifier(["com.petrasoftsolutions.mobile.qa", "com.petrasoftsolutions.mobile.staging", "com.petrasoftsolutions.mobile.prod"])
