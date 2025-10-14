@@ -178,7 +178,11 @@ jobs:
     runs-on: macos-latest
     environment: non-prod
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2.21.0
@@ -240,6 +244,10 @@ jobs:
           # Configure git to use the SSH key
           export GIT_SSH_COMMAND="ssh -i ~/.ssh/match_deploy_key -o IdentitiesOnly=yes"
           echo "GIT_SSH_COMMAND=ssh -i ~/.ssh/match_deploy_key -o IdentitiesOnly=yes" >> $GITHUB_ENV
+
+          # Export match env vars for subsequent steps
+          echo "MATCH_GIT_URL=${{ secrets.MATCH_GIT_URL }}" >> $GITHUB_ENV
+          echo "MATCH_GIT_BRANCH=${{ secrets.MATCH_GIT_BRANCH }}" >> $GITHUB_ENV
 
           echo "iOS signing environment prepared (MATCH_TYPE=${{ env.MATCH_TYPE }}) ✓"
         env:
@@ -409,7 +417,11 @@ jobs:
     environment: release
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -454,6 +466,10 @@ jobs:
           # Configure git to use the SSH key
           export GIT_SSH_COMMAND="ssh -i ~/.ssh/match_deploy_key -o IdentitiesOnly=yes"
           echo "GIT_SSH_COMMAND=ssh -i ~/.ssh/match_deploy_key -o IdentitiesOnly=yes" >> $GITHUB_ENV
+
+          # Export match env vars for subsequent steps
+          echo "MATCH_GIT_URL=${{ secrets.MATCH_GIT_URL }}" >> $GITHUB_ENV
+          echo "MATCH_GIT_BRANCH=${{ secrets.MATCH_GIT_BRANCH }}" >> $GITHUB_ENV
 
           echo "iOS signing environment prepared (MATCH_TYPE=appstore) ✓"
 

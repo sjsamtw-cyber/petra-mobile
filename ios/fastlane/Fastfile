@@ -3,11 +3,13 @@ default_platform(:ios)
 platform :ios do
   desc "Fetch certificates and provisioning profiles via Match"
   lane :fetch_certificates do |options|
-    match_type = ENV['MATCH_TYPE'] || options[:type] || 'appstore'
+    match_type = ENV['MATCH_TYPE'] || options[:type] || 'adhoc'
     
     match(
       type: match_type,
       readonly: true,
+      git_url: ENV['MATCH_GIT_URL'],
+      git_branch: ENV['MATCH_GIT_BRANCH'],
       keychain_name: "build.keychain",
       keychain_password: ""
     )
@@ -44,7 +46,7 @@ platform :ios do
       export_options: {
         method: ENV['MATCH_TYPE'] == 'appstore' ? 'app-store' : 'ad-hoc',
         provisioningProfiles: {
-          "com.petrasoftsolutions.mobile.#{flavor}" => "match AdHoc com.petrasoftsolutions.mobile.#{flavor}"
+          "com.petrasoftsolutions.mobile.#{flavor}" => ENV['MATCH_TYPE'] == 'appstore' ? "match AppStore com.petrasoftsolutions.mobile.#{flavor}" : "match AdHoc com.petrasoftsolutions.mobile.#{flavor}"
         }
       },
       # Split debug info for crash symbolication
