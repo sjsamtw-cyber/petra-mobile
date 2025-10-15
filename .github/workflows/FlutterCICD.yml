@@ -159,12 +159,13 @@ jobs:
             echo "Using Bundler: $(bundle --version)"
             echo "Ruby: $(ruby --version)"
             
-            # Run bundle exec with explicit ruby that disables site directory loading
-            # This prevents Homebrew Ruby's rubygems from being loaded
-            /Users/runner/hostedtoolcache/Ruby/3.2.9/arm64/bin/ruby \
-              --disable=did_you_mean \
-              /Users/runner/hostedtoolcache/Ruby/3.2.9/arm64/bin/bundle \
-              exec pod install --repo-update
+            # Clear RUBYLIB and RUBYOPT to prevent Homebrew's rubygems from being loaded
+            # This is the root cause - Homebrew sets these to load site_ruby
+            unset RUBYLIB
+            unset RUBYOPT
+            
+            # Use toolcache Ruby directly
+            /Users/runner/hostedtoolcache/Ruby/3.2.9/arm64/bin/bundle exec pod install --repo-update
           else
             pod install --repo-update
           fi
@@ -411,11 +412,12 @@ jobs:
             export BUNDLE_GEMFILE="$(pwd)/Gemfile"
             export BUNDLE_PATH="$(pwd)/vendor/bundle"
             
-            # Run bundle exec with explicit ruby that disables site directory loading
-            /Users/runner/hostedtoolcache/Ruby/3.2.9/arm64/bin/ruby \
-              --disable=did_you_mean \
-              /Users/runner/hostedtoolcache/Ruby/3.2.9/arm64/bin/bundle \
-              exec pod install --repo-update
+            # Clear RUBYLIB and RUBYOPT to prevent Homebrew's rubygems from being loaded
+            unset RUBYLIB
+            unset RUBYOPT
+            
+            # Use toolcache bundler directly
+            /Users/runner/hostedtoolcache/Ruby/3.2.9/arm64/bin/bundle exec pod install --repo-update
           else
             pod install --repo-update
           fi
@@ -697,11 +699,12 @@ jobs:
             export BUNDLE_GEMFILE="$(pwd)/Gemfile"
             export BUNDLE_PATH="$(pwd)/vendor/bundle"
             
-            # Run bundle exec with explicit ruby that disables site directory loading
-            /Users/runner/hostedtoolcache/Ruby/3.2.9/arm64/bin/ruby \
-              --disable=did_you_mean \
-              /Users/runner/hostedtoolcache/Ruby/3.2.9/arm64/bin/bundle \
-              exec pod install --repo-update
+            # Clear RUBYLIB and RUBYOPT to prevent Homebrew's rubygems from being loaded
+            unset RUBYLIB
+            unset RUBYOPT
+            
+            # Use toolcache bundler directly
+            /Users/runner/hostedtoolcache/Ruby/3.2.9/arm64/bin/bundle exec pod install --repo-update
           else
             pod install --repo-update
           fi
