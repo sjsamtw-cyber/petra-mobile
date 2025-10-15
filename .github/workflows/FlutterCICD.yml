@@ -134,43 +134,14 @@ jobs:
 
       # ===== Phase 3 — Install Platform Dependencies & Validate iOS Pod Integration =====
       - name: Phase 3 - Install iOS Pods & validate
+        working-directory: ios
+        env:
+          BUNDLE_PATH: vendor/bundle
         run: |
           echo "== Phase 3: pod install (repo update) =="
-          cd ios
           if [ -f Gemfile ]; then
-            unset GEM_HOME
-            unset GEM_PATH
-            export BUNDLE_GEMFILE="$(pwd)/Gemfile"
-            export BUNDLE_PATH="$(pwd)/vendor/bundle"
-            mkdir -p "$BUNDLE_PATH"
-            RUBY_BINDIR="$(dirname "$(command -v ruby)")"
-            CLEAN_PATH=$(python3 -c 'import os, sys; parts=[]; [parts.append(p) for p in os.environ.get("PATH", "").split(":") if not p.startswith("/opt/homebrew") and p not in parts]; sys.stdout.write(":".join(parts))')
-            export PATH="$RUBY_BINDIR:$BUNDLE_PATH/bin:$CLEAN_PATH"
-            rm -f "$BUNDLE_PATH/bin/bundle" "$BUNDLE_PATH/bin/bundler" || true
-            unset RUBYLIB
-            unset RUBYOPT
-            export GEM_HOME="$BUNDLE_PATH"
-            export GEM_PATH="$BUNDLE_PATH"
-            echo "=== Debug: Ruby/Bundler environment (Phase 3) ==="
-            echo "PATH: $PATH"
-            which ruby
-            ruby -v
-            which bundle
-            bundle -v
-            echo "--- bundle config list ---"
-            bundle config list || true
-            echo "--- bundle env ---"
-            bundle env || true
-            echo "--- gem env ---"
-            gem env || true
-            echo "--- GEM_* environment ---"
-            env | grep '^GEM_' || true
-            echo "--- BUNDLE_* environment ---"
-            env | grep '^BUNDLE_' || true
-            echo "--- ios/vendor/bundle contents ---"
-            ls -al $(pwd)/vendor/bundle || true
             bundle config set --local path "$BUNDLE_PATH"
-            bundle config set --local disable_shared_gems true
+            bundle config set --local deployment true
             bundle config set --local force_ruby_platform true
             bundle check || bundle install --jobs 4 --retry 3
             bundle exec pod install --repo-update
@@ -399,43 +370,14 @@ jobs:
           retention-days: 30
 
       - name: Install iOS Pods (build job)
+        working-directory: ios
+        env:
+          BUNDLE_PATH: vendor/bundle
         run: |
           echo "== Install iOS Pods (build job): pod install (repo update) =="
-          cd ios
           if [ -f Gemfile ]; then
-            unset GEM_HOME
-            unset GEM_PATH
-            export BUNDLE_GEMFILE="$(pwd)/Gemfile"
-            export BUNDLE_PATH="$(pwd)/vendor/bundle"
-            mkdir -p "$BUNDLE_PATH"
-            RUBY_BINDIR="$(dirname "$(command -v ruby)")"
-            CLEAN_PATH=$(python3 -c 'import os, sys; parts=[]; [parts.append(p) for p in os.environ.get("PATH", "").split(":") if not p.startswith("/opt/homebrew") and p not in parts]; sys.stdout.write(":".join(parts))')
-            export PATH="$RUBY_BINDIR:$BUNDLE_PATH/bin:$CLEAN_PATH"
-            rm -f "$BUNDLE_PATH/bin/bundle" "$BUNDLE_PATH/bin/bundler" || true
-            unset RUBYLIB
-            unset RUBYOPT
-            export GEM_HOME="$BUNDLE_PATH"
-            export GEM_PATH="$BUNDLE_PATH"
-            echo "=== Debug: Ruby/Bundler environment (Build job) ==="
-            echo "PATH: $PATH"
-            which ruby
-            ruby -v
-            which bundle
-            bundle -v
-            echo "--- bundle config list ---"
-            bundle config list || true
-            echo "--- bundle env ---"
-            bundle env || true
-            echo "--- gem env ---"
-            gem env || true
-            echo "--- GEM_* environment ---"
-            env | grep '^GEM_' || true
-            echo "--- BUNDLE_* environment ---"
-            env | grep '^BUNDLE_' || true
-            echo "--- ios/vendor/bundle contents ---"
-            ls -al $(pwd)/vendor/bundle || true
             bundle config set --local path "$BUNDLE_PATH"
-            bundle config set --local disable_shared_gems true
+            bundle config set --local deployment true
             bundle config set --local force_ruby_platform true
             bundle check || bundle install --jobs 4 --retry 3
             bundle exec pod install --repo-update
@@ -700,25 +642,14 @@ jobs:
           retention-days: 90
 
       - name: Install iOS Pods (build job)
+        working-directory: ios
+        env:
+          BUNDLE_PATH: vendor/bundle
         run: |
           echo "== Install iOS Pods (build job): pod install (repo update) =="
-          cd ios
           if [ -f Gemfile ]; then
-            unset GEM_HOME
-            unset GEM_PATH
-            export BUNDLE_GEMFILE="$(pwd)/Gemfile"
-            export BUNDLE_PATH="$(pwd)/vendor/bundle"
-            mkdir -p "$BUNDLE_PATH"
-            RUBY_BINDIR="$(dirname "$(command -v ruby)")"
-            CLEAN_PATH=$(python3 -c 'import os, sys; parts=[]; [parts.append(p) for p in os.environ.get("PATH", "").split(":") if not p.startswith("/opt/homebrew") and p not in parts]; sys.stdout.write(":".join(parts))')
-            export PATH="$RUBY_BINDIR:$BUNDLE_PATH/bin:$CLEAN_PATH"
-            rm -f "$BUNDLE_PATH/bin/bundle" "$BUNDLE_PATH/bin/bundler" || true
-            unset RUBYLIB
-            unset RUBYOPT
-            export GEM_HOME="$BUNDLE_PATH"
-            export GEM_PATH="$BUNDLE_PATH"
             bundle config set --local path "$BUNDLE_PATH"
-            bundle config set --local disable_shared_gems true
+            bundle config set --local deployment true
             bundle config set --local force_ruby_platform true
             bundle check || bundle install --jobs 4 --retry 3
             bundle exec pod install --repo-update
