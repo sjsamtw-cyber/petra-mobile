@@ -43,30 +43,45 @@ jobs:
           architecture: "arm64"
 
       # ===== Ruby, Bundler & Fastlane Setup =====
-      - name: Use Homebrew Ruby & install Bundler (global)
+      - name: Detect and select Ruby (Homebrew preferred)
         run: |
-          echo "Using Homebrew Ruby from /opt/homebrew/bin"
-          export PATH=/opt/homebrew/bin:$PATH
-          /opt/homebrew/bin/ruby --version
-          /opt/homebrew/bin/gem install bundler -v 2.6.9 --no-document || true
-          /opt/homebrew/bin/bundle --version || true
+          # Choose Homebrew Ruby if present, otherwise fallback to system ruby
+          if [ -x /opt/homebrew/bin/ruby ]; then
+            RUBY_BIN=/opt/homebrew/bin/ruby
+          else
+            RUBY_BIN=$(which ruby || echo /usr/bin/ruby)
+          fi
+          GEM_BIN=$(dirname "$RUBY_BIN")/gem
+          BUNDLE_BIN=$(dirname "$RUBY_BIN")/bundle
+          # fallback to which if bin not present
+          if [ ! -x "$GEM_BIN" ]; then GEM_BIN=$(which gem || true); fi
+          if [ ! -x "$BUNDLE_BIN" ]; then BUNDLE_BIN=$(which bundle || true); fi
+          echo "RUBY_BIN=$RUBY_BIN" >> $GITHUB_ENV
+          echo "GEM_BIN=$GEM_BIN" >> $GITHUB_ENV
+          echo "BUNDLE_BIN=$BUNDLE_BIN" >> $GITHUB_ENV
+          echo "Selected RUBY: $RUBY_BIN"
+          $RUBY_BIN --version || true
+          $GEM_BIN install bundler -v 2.6.9 --no-document || true
+          $BUNDLE_BIN --version || true
 
       - name: Prepare iOS Bundler environment (using Homebrew Ruby)
         working-directory: ios
         run: |
-          echo "Preparing iOS bundler (Homebrew Ruby)"
-          export PATH=/opt/homebrew/bin:$PATH
-          /opt/homebrew/bin/ruby --version
+          echo "Preparing iOS bundler (selected Ruby)"
+          if [ -z "$RUBY_BIN" ]; then
+            echo "RUBY_BIN not set; aborting"
+            exit 1
+          fi
           if [ -f Gemfile ]; then
-            /opt/homebrew/bin/gem install bundler -v 2.6.9 --no-document || true
+            $GEM_BIN install bundler -v 2.6.9 --no-document || true
             export BUNDLE_GEMFILE="$(pwd)/Gemfile"
             export BUNDLE_PATH="$(pwd)/vendor/bundle"
-            export GEM_HOME="$(pwd)/vendor/bundle/ruby/$(/opt/homebrew/bin/ruby -e 'print RUBY_VERSION')"
+            export GEM_HOME="$(pwd)/vendor/bundle/ruby/$($RUBY_BIN -e 'print RUBY_VERSION')"
             export GEM_PATH="$GEM_HOME"
-            /opt/homebrew/bin/bundle config set --local deployment 'true'
-            /opt/homebrew/bin/bundle config set --local without 'development test'
-            /opt/homebrew/bin/bundle config set --local path 'vendor/bundle'
-            /opt/homebrew/bin/bundle install --jobs=4 --retry=3 --path vendor/bundle --deployment --quiet
+            $BUNDLE_BIN config set --local deployment 'true'
+            $BUNDLE_BIN config set --local without 'development test'
+            $BUNDLE_BIN config set --local path 'vendor/bundle'
+            $BUNDLE_BIN install --jobs=4 --retry=3 --path vendor/bundle --deployment --quiet
           else
             echo "No Gemfile in ios, skipping bundle install"
           fi
@@ -82,19 +97,21 @@ jobs:
       - name: Prepare Android Bundler environment (using Homebrew Ruby)
         working-directory: android
         run: |
-          echo "Preparing Android bundler (Homebrew Ruby)"
-          export PATH=/opt/homebrew/bin:$PATH
-          /opt/homebrew/bin/ruby --version
+          echo "Preparing Android bundler (selected Ruby)"
+          if [ -z "$RUBY_BIN" ]; then
+            echo "RUBY_BIN not set; aborting"
+            exit 1
+          fi
           if [ -f Gemfile ]; then
-            /opt/homebrew/bin/gem install bundler -v 2.6.9 --no-document || true
+            $GEM_BIN install bundler -v 2.6.9 --no-document || true
             export BUNDLE_GEMFILE="$(pwd)/Gemfile"
             export BUNDLE_PATH="$(pwd)/vendor/bundle"
-            export GEM_HOME="$(pwd)/vendor/bundle/ruby/$(/opt/homebrew/bin/ruby -e 'print RUBY_VERSION')"
+            export GEM_HOME="$(pwd)/vendor/bundle/ruby/$($RUBY_BIN -e 'print RUBY_VERSION')"
             export GEM_PATH="$GEM_HOME"
-            /opt/homebrew/bin/bundle config set --local deployment 'true'
-            /opt/homebrew/bin/bundle config set --local without 'development test'
-            /opt/homebrew/bin/bundle config set --local path 'vendor/bundle'
-            /opt/homebrew/bin/bundle install --jobs=4 --retry=3 --path vendor/bundle --deployment --quiet
+            $BUNDLE_BIN config set --local deployment 'true'
+            $BUNDLE_BIN config set --local without 'development test'
+            $BUNDLE_BIN config set --local path 'vendor/bundle'
+            $BUNDLE_BIN install --jobs=4 --retry=3 --path vendor/bundle --deployment --quiet
           else
             echo "No Gemfile in android, skipping bundle install"
           fi
@@ -192,18 +209,13 @@ jobs:
           echo "== Phase 3: pod install (repo update) =="
 
           if [ -f Gemfile ]; then
-            # ruby/setup-ruby installed Bundler 2.6.9 globally and restored gems to vendor/bundle
-            # Use the global bundler but ensure it uses the vendored gems
             export BUNDLE_GEMFILE="$(pwd)/Gemfile"
             export BUNDLE_PATH="$(pwd)/vendor/bundle"
-            
-            # Use Homebrew Ruby's bundler explicitly
-            export PATH=/opt/homebrew/bin:$PATH
-            echo "Using Bundler: $(/opt/homebrew/bin/bundle --version)"
-            echo "Ruby: $(/opt/homebrew/bin/ruby --version)"
-            export BUNDLE_GEMFILE="$(pwd)/Gemfile"
-            export BUNDLE_PATH="$(pwd)/vendor/bundle"
-            /opt/homebrew/bin/bundle exec pod install --repo-update
+            export GEM_HOME="$(pwd)/vendor/bundle/ruby/$($RUBY_BIN -e 'print RUBY_VERSION')"
+            export GEM_PATH="$GEM_HOME"
+            echo "Using Bundler: $BUNDLE_BIN --version"
+            echo "Ruby: $RUBY_BIN --version"
+            $BUNDLE_BIN exec pod install --repo-update
           else
             pod install --repo-update
           fi
@@ -284,50 +296,66 @@ jobs:
           cache: true
           architecture: "arm64"
 
-      - name: Use Homebrew Ruby & install Bundler (global)
+      - name: Detect and select Ruby (Homebrew preferred)
         run: |
-          echo "Using Homebrew Ruby from /opt/homebrew/bin"
-          export PATH=/opt/homebrew/bin:$PATH
-          /opt/homebrew/bin/ruby --version
-          /opt/homebrew/bin/gem install bundler -v 2.6.9 --no-document || true
-          /opt/homebrew/bin/bundle --version || true
+          # Choose Homebrew Ruby if present, otherwise fallback to system ruby
+          if [ -x /opt/homebrew/bin/ruby ]; then
+            RUBY_BIN=/opt/homebrew/bin/ruby
+          else
+            RUBY_BIN=$(which ruby || echo /usr/bin/ruby)
+          fi
+          GEM_BIN=$(dirname "$RUBY_BIN")/gem
+          BUNDLE_BIN=$(dirname "$RUBY_BIN")/bundle
+          if [ ! -x "$GEM_BIN" ]; then GEM_BIN=$(which gem || true); fi
+          if [ ! -x "$BUNDLE_BIN" ]; then BUNDLE_BIN=$(which bundle || true); fi
+          echo "RUBY_BIN=$RUBY_BIN" >> $GITHUB_ENV
+          echo "GEM_BIN=$GEM_BIN" >> $GITHUB_ENV
+          echo "BUNDLE_BIN=$BUNDLE_BIN" >> $GITHUB_ENV
+          echo "Selected RUBY: $RUBY_BIN"
+          $RUBY_BIN --version || true
+          $GEM_BIN install bundler -v 2.6.9 --no-document || true
+          $BUNDLE_BIN --version || true
 
-      - name: Prepare iOS Bundler environment (using Homebrew Ruby)
+      - name: Prepare iOS Bundler environment (selected Ruby)
         working-directory: ios
         run: |
-          echo "Preparing iOS bundler (Homebrew Ruby)"
-          export PATH=/opt/homebrew/bin:$PATH
-          /opt/homebrew/bin/ruby --version
+          echo "Preparing iOS bundler (selected Ruby)"
+          if [ -z "$RUBY_BIN" ]; then
+            echo "RUBY_BIN not set; aborting"
+            exit 1
+          fi
           if [ -f Gemfile ]; then
-            /opt/homebrew/bin/gem install bundler -v 2.6.9 --no-document || true
+            $GEM_BIN install bundler -v 2.6.9 --no-document || true
             export BUNDLE_GEMFILE="$(pwd)/Gemfile"
             export BUNDLE_PATH="$(pwd)/vendor/bundle"
-            export GEM_HOME="$(pwd)/vendor/bundle/ruby/$(/opt/homebrew/bin/ruby -e 'print RUBY_VERSION')"
+            export GEM_HOME="$(pwd)/vendor/bundle/ruby/$($RUBY_BIN -e 'print RUBY_VERSION')"
             export GEM_PATH="$GEM_HOME"
-            /opt/homebrew/bin/bundle config set --local deployment 'true'
-            /opt/homebrew/bin/bundle config set --local without 'development test'
-            /opt/homebrew/bin/bundle config set --local path 'vendor/bundle'
-            /opt/homebrew/bin/bundle install --jobs=4 --retry=3 --path vendor/bundle --deployment --quiet
+            $BUNDLE_BIN config set --local deployment 'true'
+            $BUNDLE_BIN config set --local without 'development test'
+            $BUNDLE_BIN config set --local path 'vendor/bundle'
+            $BUNDLE_BIN install --jobs=4 --retry=3 --path vendor/bundle --deployment --quiet
           else
             echo "No Gemfile in ios, skipping bundle install"
           fi
 
-      - name: Prepare Android Bundler environment (using Homebrew Ruby)
+      - name: Prepare Android Bundler environment (selected Ruby)
         working-directory: android
         run: |
-          echo "Preparing Android bundler (Homebrew Ruby)"
-          export PATH=/opt/homebrew/bin:$PATH
-          /opt/homebrew/bin/ruby --version
+          echo "Preparing Android bundler (selected Ruby)"
+          if [ -z "$RUBY_BIN" ]; then
+            echo "RUBY_BIN not set; aborting"
+            exit 1
+          fi
           if [ -f Gemfile ]; then
-            /opt/homebrew/bin/gem install bundler -v 2.6.9 --no-document || true
+            $GEM_BIN install bundler -v 2.6.9 --no-document || true
             export BUNDLE_GEMFILE="$(pwd)/Gemfile"
             export BUNDLE_PATH="$(pwd)/vendor/bundle"
-            export GEM_HOME="$(pwd)/vendor/bundle/ruby/$(/opt/homebrew/bin/ruby -e 'print RUBY_VERSION')"
+            export GEM_HOME="$(pwd)/vendor/bundle/ruby/$($RUBY_BIN -e 'print RUBY_VERSION')"
             export GEM_PATH="$GEM_HOME"
-            /opt/homebrew/bin/bundle config set --local deployment 'true'
-            /opt/homebrew/bin/bundle config set --local without 'development test'
-            /opt/homebrew/bin/bundle config set --local path 'vendor/bundle'
-            /opt/homebrew/bin/bundle install --jobs=4 --retry=3 --path vendor/bundle --deployment --quiet
+            $BUNDLE_BIN config set --local deployment 'true'
+            $BUNDLE_BIN config set --local without 'development test'
+            $BUNDLE_BIN config set --local path 'vendor/bundle'
+            $BUNDLE_BIN install --jobs=4 --retry=3 --path vendor/bundle --deployment --quiet
           else
             echo "No Gemfile in android, skipping bundle install"
           fi
@@ -487,15 +515,11 @@ jobs:
         run: |
           echo "== Install iOS Pods (build job): pod install (repo update) =="
           if [ -f Gemfile ]; then
-            # ruby/setup-ruby installed Bundler 2.6.9 globally and restored gems to vendor/bundle
-            # Use the global bundler but ensure it uses the vendored gems
             export BUNDLE_GEMFILE="$(pwd)/Gemfile"
             export BUNDLE_PATH="$(pwd)/vendor/bundle"
-            
-            export PATH=/opt/homebrew/bin:$PATH
-            export BUNDLE_GEMFILE="$(pwd)/Gemfile"
-            export BUNDLE_PATH="$(pwd)/vendor/bundle"
-            /opt/homebrew/bin/bundle exec pod install --repo-update
+            export GEM_HOME="$(pwd)/vendor/bundle/ruby/$($RUBY_BIN -e 'print RUBY_VERSION')"
+            export GEM_PATH="$GEM_HOME"
+            $BUNDLE_BIN exec pod install --repo-update
           else
             pod install --repo-update
           fi
@@ -632,38 +656,65 @@ jobs:
           cache: true
           architecture: "arm64"
 
-      - name: Use Homebrew Ruby & install Bundler (global)
+      - name: Detect and select Ruby (Homebrew preferred)
         run: |
-          echo "Using Homebrew Ruby from /opt/homebrew/bin"
-          export PATH=/opt/homebrew/bin:$PATH
-          /opt/homebrew/bin/ruby --version
-          /opt/homebrew/bin/gem install bundler -v 2.6.9 --no-document || true
-          /opt/homebrew/bin/bundle --version || true
+          if [ -x /opt/homebrew/bin/ruby ]; then
+            RUBY_BIN=/opt/homebrew/bin/ruby
+          else
+            RUBY_BIN=$(which ruby || echo /usr/bin/ruby)
+          fi
+          GEM_BIN=$(dirname "$RUBY_BIN")/gem
+          BUNDLE_BIN=$(dirname "$RUBY_BIN")/bundle
+          if [ ! -x "$GEM_BIN" ]; then GEM_BIN=$(which gem || true); fi
+          if [ ! -x "$BUNDLE_BIN" ]; then BUNDLE_BIN=$(which bundle || true); fi
+          echo "RUBY_BIN=$RUBY_BIN" >> $GITHUB_ENV
+          echo "GEM_BIN=$GEM_BIN" >> $GITHUB_ENV
+          echo "BUNDLE_BIN=$BUNDLE_BIN" >> $GITHUB_ENV
+          echo "Selected RUBY: $RUBY_BIN"
+          $RUBY_BIN --version || true
+          $GEM_BIN install bundler -v 2.6.9 --no-document || true
+          $BUNDLE_BIN --version || true
 
-      - name: Prepare iOS Bundler environment (using Homebrew Ruby)
+      - name: Prepare iOS Bundler environment (selected Ruby)
         working-directory: ios
         run: |
-          echo "Preparing iOS bundler (Homebrew Ruby)"
-          export PATH=/opt/homebrew/bin:$PATH
-          /opt/homebrew/bin/ruby --version
+          echo "Preparing iOS bundler (selected Ruby)"
+          if [ -z "$RUBY_BIN" ]; then
+            echo "RUBY_BIN not set; aborting"
+            exit 1
+          fi
           if [ -f Gemfile ]; then
-            /opt/homebrew/bin/gem install bundler -v 2.6.9 --no-document || true
-            /opt/homebrew/bin/bundle config set --local path 'vendor/bundle'
-            /opt/homebrew/bin/bundle install --jobs=4 --retry=3 --path vendor/bundle
+            $GEM_BIN install bundler -v 2.6.9 --no-document || true
+            export BUNDLE_GEMFILE="$(pwd)/Gemfile"
+            export BUNDLE_PATH="$(pwd)/vendor/bundle"
+            export GEM_HOME="$(pwd)/vendor/bundle/ruby/$($RUBY_BIN -e 'print RUBY_VERSION')"
+            export GEM_PATH="$GEM_HOME"
+            $BUNDLE_BIN config set --local deployment 'true'
+            $BUNDLE_BIN config set --local without 'development test'
+            $BUNDLE_BIN config set --local path 'vendor/bundle'
+            $BUNDLE_BIN install --jobs=4 --retry=3 --path vendor/bundle --deployment --quiet
           else
             echo "No Gemfile in ios, skipping bundle install"
           fi
 
-      - name: Prepare Android Bundler environment (using Homebrew Ruby)
+      - name: Prepare Android Bundler environment (selected Ruby)
         working-directory: android
         run: |
-          echo "Preparing Android bundler (Homebrew Ruby)"
-          export PATH=/opt/homebrew/bin:$PATH
-          /opt/homebrew/bin/ruby --version
+          echo "Preparing Android bundler (selected Ruby)"
+          if [ -z "$RUBY_BIN" ]; then
+            echo "RUBY_BIN not set; aborting"
+            exit 1
+          fi
           if [ -f Gemfile ]; then
-            /opt/homebrew/bin/gem install bundler -v 2.6.9 --no-document || true
-            /opt/homebrew/bin/bundle config set --local path 'vendor/bundle'
-            /opt/homebrew/bin/bundle install --jobs=4 --retry=3 --path vendor/bundle
+            $GEM_BIN install bundler -v 2.6.9 --no-document || true
+            export BUNDLE_GEMFILE="$(pwd)/Gemfile"
+            export BUNDLE_PATH="$(pwd)/vendor/bundle"
+            export GEM_HOME="$(pwd)/vendor/bundle/ruby/$($RUBY_BIN -e 'print RUBY_VERSION')"
+            export GEM_PATH="$GEM_HOME"
+            $BUNDLE_BIN config set --local deployment 'true'
+            $BUNDLE_BIN config set --local without 'development test'
+            $BUNDLE_BIN config set --local path 'vendor/bundle'
+            $BUNDLE_BIN install --jobs=4 --retry=3 --path vendor/bundle --deployment --quiet
           else
             echo "No Gemfile in android, skipping bundle install"
           fi
@@ -786,15 +837,11 @@ jobs:
         run: |
           echo "== Install iOS Pods (build job): pod install (repo update) =="
           if [ -f Gemfile ]; then
-            # ruby/setup-ruby installed Bundler 2.6.9 globally and restored gems to vendor/bundle
-            # Use the global bundler but ensure it uses the vendored gems
             export BUNDLE_GEMFILE="$(pwd)/Gemfile"
             export BUNDLE_PATH="$(pwd)/vendor/bundle"
-            
-            export PATH=/opt/homebrew/bin:$PATH
-            export BUNDLE_GEMFILE="$(pwd)/Gemfile"
-            export BUNDLE_PATH="$(pwd)/vendor/bundle"
-            /opt/homebrew/bin/bundle exec pod install --repo-update
+            export GEM_HOME="$(pwd)/vendor/bundle/ruby/$($RUBY_BIN -e 'print RUBY_VERSION')"
+            export GEM_PATH="$GEM_HOME"
+            $BUNDLE_BIN exec pod install --repo-update
           else
             pod install --repo-update
           fi
