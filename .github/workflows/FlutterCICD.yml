@@ -121,16 +121,9 @@ jobs:
         run: |
           echo "== Phase 3: pod install (repo update) =="
           cd ios
-          # Ensure Bundler uses the ios/Gemfile and installs into ios/vendor/bundle
-          if [ -f Gemfile ]; then
-            export BUNDLE_GEMFILE=$(pwd)/Gemfile
-            export BUNDLE_PATH=$(pwd)/vendor/bundle
-          fi
           # Use bundle exec to ensure correct CocoaPods version
           if [ -f Gemfile ]; then
-            # install gems into ./vendor/bundle so bundle exec below can find them
-            bundle config set --local path 'vendor/bundle'
-            bundle install --jobs 4 --retry 3 --path vendor/bundle
+            # bundler-cache from ruby/setup-ruby already installed gems, just run pod install
             bundle exec pod install --repo-update
           else
             pod install --repo-update
@@ -309,10 +302,8 @@ jobs:
       - name: Install Fastlane gems (Android)
         run: |
           cd android
-          if [ -f Gemfile ]; then
-            bundle config set --local path 'vendor/bundle'
-            bundle install --jobs 4 --retry 3 --path vendor/bundle
-          fi
+          # bundler-cache from ruby/setup-ruby already installed gems
+          echo "Gems already cached by ruby/setup-ruby action"
 
       - name: Build Android (flavor from branch)
         run: |
@@ -357,20 +348,15 @@ jobs:
       - name: Install Fastlane gems (iOS)
         run: |
           cd ios
-          if [ -f Gemfile ]; then
-            # install gems into ./vendor/bundle to keep them local to the ios directory
-            bundle config set --local path 'vendor/bundle'
-            bundle install --jobs 4 --retry 3 --path vendor/bundle
-          fi
+          # bundler-cache from ruby/setup-ruby already installed gems
+          echo "Gems already cached by ruby/setup-ruby action"
 
       - name: Install iOS Pods (build job)
         run: |
           echo "== Install iOS Pods (build job): pod install (repo update) =="
           cd ios
           if [ -f Gemfile ]; then
-            # ensure bundler installs into ./vendor/bundle and then run pod install via bundle exec
-            bundle config set --local path 'vendor/bundle'
-            bundle install --jobs 4 --retry 3 --path vendor/bundle
+            # bundler-cache from ruby/setup-ruby already installed gems, just run pod install
             bundle exec pod install --repo-update
           else
             pod install --repo-update
@@ -588,10 +574,8 @@ jobs:
       - name: Install Fastlane gems (Android)
         run: |
           cd android
-          if [ -f Gemfile ]; then
-            bundle config set --local path 'vendor/bundle'
-            bundle install --jobs 4 --retry 3 --path vendor/bundle
-          fi
+          # bundler-cache from ruby/setup-ruby already installed gems
+          echo "Gems already cached by ruby/setup-ruby action"
 
       - name: Build Android (prod)
         run: |
@@ -634,21 +618,15 @@ jobs:
       - name: Install Fastlane gems (iOS)
         run: |
           cd ios
-          if [ -f Gemfile ]; then
-            bundle config set --local path 'vendor/bundle'
-            bundle install --jobs 4 --retry 3 --path vendor/bundle
-          fi
+          # bundler-cache from ruby/setup-ruby already installed gems
+          echo "Gems already cached by ruby/setup-ruby action"
 
       - name: Install iOS Pods (build job)
         run: |
           echo "== Install iOS Pods (build job): pod install (repo update) =="
           cd ios
           if [ -f Gemfile ]; then
-            # ensure Bundler uses ios/Gemfile and installs into ios/vendor/bundle
-            export BUNDLE_GEMFILE=$(pwd)/Gemfile
-            export BUNDLE_PATH=$(pwd)/vendor/bundle
-            bundle config set --local path 'vendor/bundle'
-            bundle install --jobs 4 --retry 3 --path vendor/bundle
+            # bundler-cache from ruby/setup-ruby already installed gems, just run pod install
             bundle exec pod install --repo-update
           else
             pod install --repo-update
