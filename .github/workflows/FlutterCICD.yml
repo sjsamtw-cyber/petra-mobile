@@ -143,8 +143,10 @@ jobs:
             export BUNDLE_GEMFILE="$(pwd)/Gemfile"
             export BUNDLE_PATH="$(pwd)/vendor/bundle"
             mkdir -p "$BUNDLE_PATH"
+            RUBY_BINDIR="$(dirname "$(command -v ruby)")"
             CLEAN_PATH=$(python3 -c 'import os, sys; parts=[]; [parts.append(p) for p in os.environ.get("PATH", "").split(":") if not p.startswith("/opt/homebrew") and p not in parts]; sys.stdout.write(":".join(parts))')
-            export PATH="$BUNDLE_PATH/bin:$CLEAN_PATH"
+            export PATH="$RUBY_BINDIR:$BUNDLE_PATH/bin:$CLEAN_PATH"
+            rm -f "$BUNDLE_PATH/bin/bundle" "$BUNDLE_PATH/bin/bundler" || true
             unset RUBYLIB
             unset RUBYOPT
             export GEM_HOME="$BUNDLE_PATH"
@@ -406,8 +408,10 @@ jobs:
             export BUNDLE_GEMFILE="$(pwd)/Gemfile"
             export BUNDLE_PATH="$(pwd)/vendor/bundle"
             mkdir -p "$BUNDLE_PATH"
+            RUBY_BINDIR="$(dirname "$(command -v ruby)")"
             CLEAN_PATH=$(python3 -c 'import os, sys; parts=[]; [parts.append(p) for p in os.environ.get("PATH", "").split(":") if not p.startswith("/opt/homebrew") and p not in parts]; sys.stdout.write(":".join(parts))')
-            export PATH="$BUNDLE_PATH/bin:$CLEAN_PATH"
+            export PATH="$RUBY_BINDIR:$BUNDLE_PATH/bin:$CLEAN_PATH"
+            rm -f "$BUNDLE_PATH/bin/bundle" "$BUNDLE_PATH/bin/bundler" || true
             unset RUBYLIB
             unset RUBYOPT
             export GEM_HOME="$BUNDLE_PATH"
@@ -705,8 +709,10 @@ jobs:
             export BUNDLE_GEMFILE="$(pwd)/Gemfile"
             export BUNDLE_PATH="$(pwd)/vendor/bundle"
             mkdir -p "$BUNDLE_PATH"
+            RUBY_BINDIR="$(dirname "$(command -v ruby)")"
             CLEAN_PATH=$(python3 -c 'import os, sys; parts=[]; [parts.append(p) for p in os.environ.get("PATH", "").split(":") if not p.startswith("/opt/homebrew") and p not in parts]; sys.stdout.write(":".join(parts))')
-            export PATH="$BUNDLE_PATH/bin:$CLEAN_PATH"
+            export PATH="$RUBY_BINDIR:$BUNDLE_PATH/bin:$CLEAN_PATH"
+            rm -f "$BUNDLE_PATH/bin/bundle" "$BUNDLE_PATH/bin/bundler" || true
             unset RUBYLIB
             unset RUBYOPT
             export GEM_HOME="$BUNDLE_PATH"
