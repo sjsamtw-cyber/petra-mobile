@@ -319,7 +319,7 @@ jobs:
           KEY_PASSWORD: ${{ env.KEY_PASSWORD }}
 
       - name: Upload Android to Play Store
-        if: env.FLAVOR == 'qa' || env.FLAVOR == 'staging'
+        if: steps.determine_flavor.outputs.flavor == 'qa' || steps.determine_flavor.outputs.flavor == 'staging'
         run: |
           cd android
           echo "Uploading Android flavor: $FLAVOR to Play Store Internal track"
@@ -332,7 +332,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: android-${{ env.FLAVOR }}-${{ github.run_number }}
+          name: android-${{ steps.determine_flavor.outputs.flavor }}-${{ github.run_number }}
           path: |
             android/app/build/outputs/bundle/**/*.aab
             android/app/build/outputs/mapping/**/*.txt
@@ -350,6 +350,19 @@ jobs:
           if [ -f Gemfile ]; then
             bundle install --jobs 4 --retry 3
           fi
+
+      - name: Install iOS Pods (build job)
+        run: |
+          echo "== Install iOS Pods (build job): pod install (repo update) =="
+          cd ios
+          if [ -f Gemfile ]; then
+            bundle install --jobs 4 --retry 3
+            bundle exec pod install --repo-update
+          else
+            pod install --repo-update
+          fi
+
+          echo "Install iOS Pods (build job) completed: pods installed ✓"
 
       - name: Run Fastlane Match (iOS)
         run: |
@@ -415,7 +428,7 @@ jobs:
           APP_STORE_CONNECT_API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
 
       - name: Upload iOS to TestFlight
-        if: env.FLAVOR == 'qa' || env.FLAVOR == 'staging'
+        if: steps.determine_flavor.outputs.flavor == 'qa' || steps.determine_flavor.outputs.flavor == 'staging'
         run: |
           cd ios
           echo "Uploading iOS flavor: $FLAVOR to TestFlight (Internal)"
@@ -430,7 +443,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: ios-${{ env.FLAVOR }}-${{ github.run_number }}
+          name: ios-${{ steps.determine_flavor.outputs.flavor }}-${{ github.run_number }}
           path: |
             ios/build/*.ipa
             ios/build/*.dSYM.zip
@@ -609,6 +622,19 @@ jobs:
           if [ -f Gemfile ]; then
             bundle install --jobs 4 --retry 3
           fi
+
+      - name: Install iOS Pods (build job)
+        run: |
+          echo "== Install iOS Pods (build job): pod install (repo update) =="
+          cd ios
+          if [ -f Gemfile ]; then
+            bundle install --jobs 4 --retry 3
+            bundle exec pod install --repo-update
+          else
+            pod install --repo-update
+          fi
+
+          echo "Install iOS Pods (build job) completed: pods installed ✓"
 
       - name: Run Fastlane Match (iOS - appstore)
         run: |
