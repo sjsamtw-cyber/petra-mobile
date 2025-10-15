@@ -135,8 +135,6 @@ jobs:
       # ===== Phase 3 — Install Platform Dependencies & Validate iOS Pod Integration =====
       - name: Phase 3 - Install iOS Pods & validate
         working-directory: ios
-        env:
-          BUNDLE_PATH: vendor/bundle
         run: |
           echo "== Phase 3: pod install (repo update) =="
           if [ -f Gemfile ]; then
@@ -145,13 +143,21 @@ jobs:
             export PATH="$RUBY_BINDIR:$CLEAN_PATH"
             unset RUBYLIB
             unset RUBYOPT
+            unset GEM_HOME
+            unset GEM_PATH
+            export BUNDLE_GEMFILE="$(pwd)/Gemfile"
+            export BUNDLE_PATH="$(pwd)/vendor/bundle"
+            RUBY_VERSION_DIR=$(ruby -e 'require "rbconfig"; print RbConfig::CONFIG["ruby_version"]')
+            export GEM_HOME="$BUNDLE_PATH/ruby/$RUBY_VERSION_DIR"
+            export GEM_PATH="$GEM_HOME"
+            mkdir -p "$GEM_HOME"
             bundle config set --local path "$BUNDLE_PATH"
             bundle config set --local deployment true
             bundle config set --local force_ruby_platform true
             bundle config set --local disable_shared_gems true
             echo "--- bundle env (debug) ---"
             bundle env || true
-            bundle check || bundle install --jobs 4 --retry 3
+            bundle install --jobs 4 --retry 3 --deployment
             bundle exec pod install --repo-update
           else
             pod install --repo-update
@@ -379,8 +385,6 @@ jobs:
 
       - name: Install iOS Pods (build job)
         working-directory: ios
-        env:
-          BUNDLE_PATH: vendor/bundle
         run: |
           echo "== Install iOS Pods (build job): pod install (repo update) =="
           if [ -f Gemfile ]; then
@@ -389,13 +393,21 @@ jobs:
             export PATH="$RUBY_BINDIR:$CLEAN_PATH"
             unset RUBYLIB
             unset RUBYOPT
+            unset GEM_HOME
+            unset GEM_PATH
+            export BUNDLE_GEMFILE="$(pwd)/Gemfile"
+            export BUNDLE_PATH="$(pwd)/vendor/bundle"
+            RUBY_VERSION_DIR=$(ruby -e 'require "rbconfig"; print RbConfig::CONFIG["ruby_version"]')
+            export GEM_HOME="$BUNDLE_PATH/ruby/$RUBY_VERSION_DIR"
+            export GEM_PATH="$GEM_HOME"
+            mkdir -p "$GEM_HOME"
             bundle config set --local path "$BUNDLE_PATH"
             bundle config set --local deployment true
             bundle config set --local force_ruby_platform true
             bundle config set --local disable_shared_gems true
             echo "--- bundle env (debug) ---"
             bundle env || true
-            bundle check || bundle install --jobs 4 --retry 3
+            bundle install --jobs 4 --retry 3 --deployment
             bundle exec pod install --repo-update
           else
             pod install --repo-update
@@ -659,8 +671,6 @@ jobs:
 
       - name: Install iOS Pods (build job)
         working-directory: ios
-        env:
-          BUNDLE_PATH: vendor/bundle
         run: |
           echo "== Install iOS Pods (build job): pod install (repo update) =="
           if [ -f Gemfile ]; then
@@ -669,13 +679,21 @@ jobs:
             export PATH="$RUBY_BINDIR:$CLEAN_PATH"
             unset RUBYLIB
             unset RUBYOPT
+            unset GEM_HOME
+            unset GEM_PATH
+            export BUNDLE_GEMFILE="$(pwd)/Gemfile"
+            export BUNDLE_PATH="$(pwd)/vendor/bundle"
+            RUBY_VERSION_DIR=$(ruby -e 'require "rbconfig"; print RbConfig::CONFIG["ruby_version"]')
+            export GEM_HOME="$BUNDLE_PATH/ruby/$RUBY_VERSION_DIR"
+            export GEM_PATH="$GEM_HOME"
+            mkdir -p "$GEM_HOME"
             bundle config set --local path "$BUNDLE_PATH"
             bundle config set --local deployment true
             bundle config set --local force_ruby_platform true
             bundle config set --local disable_shared_gems true
             echo "--- bundle env (debug) ---"
             bundle env || true
-            bundle check || bundle install --jobs 4 --retry 3
+            bundle install --jobs 4 --retry 3 --deployment
             bundle exec pod install --repo-update
           else
             pod install --repo-update
