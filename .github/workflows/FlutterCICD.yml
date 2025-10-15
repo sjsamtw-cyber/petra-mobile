@@ -137,16 +137,51 @@ jobs:
         working-directory: ios
         run: |
           echo "== Phase 3: pod install (repo update) =="
-          if [ -f Gemfile ]; then
-            # The setup-ruby action already installed gems to vendor/bundle; just run pod install
-            VENDOR_BUNDLER="$(pwd)/vendor/bundle/ruby/3.2.0/bin/bundle"
-            if [ -f "$VENDOR_BUNDLER" ]; then
-              echo "Using vendor Bundler: $VENDOR_BUNDLER"
-              BUNDLE_GEMFILE="$(pwd)/Gemfile" "$VENDOR_BUNDLER" exec pod install --repo-update
-            else
-              echo "Vendor bundler not found, falling back to system bundle exec"
-              bundle exec pod install --repo-update
+
+          # DEBUG: Show what's actually in vendor/bundle
+          echo "=== DEBUG: Checking vendor/bundle contents ==="
+          echo "PWD: $(pwd)"
+          if [ -d "vendor/bundle" ]; then
+            echo "vendor/bundle directory EXISTS"
+            echo "Size: $(du -sh vendor/bundle)"
+            echo "Contents of vendor/bundle:"
+            ls -la vendor/bundle/ || true
+            if [ -d "vendor/bundle/ruby" ]; then
+              echo "Ruby subdirectories:"
+              ls -la vendor/bundle/ruby/ || true
+              echo "Gem directories (if any):"
+              find vendor/bundle/ruby -type d -name "gems" -exec ls -la {} \; || true
+              echo "Sample gems (first 10):"
+              find vendor/bundle/ruby -type d -path "*/gems/*" -maxdepth 4 | head -10 || true
             fi
+          else
+            echo "WARNING: vendor/bundle directory DOES NOT EXIST!"
+          fi
+
+          # DEBUG: Check bundle config
+          echo "=== DEBUG: Bundle configuration ==="
+          bundle config list || true
+
+          if [ -f Gemfile ]; then
+            # ruby/setup-ruby installed Bundler 2.6.9 globally and restored gems to vendor/bundle
+            # Use the global bundler but ensure it uses the vendored gems
+            export BUNDLE_GEMFILE="$(pwd)/Gemfile"
+            export BUNDLE_PATH="$(pwd)/vendor/bundle"
+            
+            # Verify bundler version
+            echo "=== DEBUG: Bundler environment ==="
+            echo "Using Bundler: $(bundle --version)"
+            echo "Ruby: $(ruby --version)"
+            echo "BUNDLE_GEMFILE=$BUNDLE_GEMFILE"
+            echo "BUNDLE_PATH=$BUNDLE_PATH"
+            echo "Which bundle: $(which bundle)"
+            
+            # Try to list gems that bundler sees
+            echo "=== DEBUG: Gems visible to bundler ==="
+            bundle list || echo "bundle list failed"
+            
+            # Run pod install via bundler
+            bundle exec pod install --repo-update
           else
             pod install --repo-update
           fi
@@ -376,15 +411,13 @@ jobs:
         run: |
           echo "== Install iOS Pods (build job): pod install (repo update) =="
           if [ -f Gemfile ]; then
-            # Use the vendor Bundler directly to avoid system Bundler interference
-            VENDOR_BUNDLER="$(pwd)/vendor/bundle/ruby/3.2.0/bin/bundle"
-            if [ -f "$VENDOR_BUNDLER" ]; then
-              echo "Using vendor Bundler: $VENDOR_BUNDLER"
-              BUNDLE_GEMFILE="$(pwd)/Gemfile" "$VENDOR_BUNDLER" exec pod install --repo-update
-            else
-              echo "Vendor bundler not found, falling back to system bundle exec"
-              bundle exec pod install --repo-update
-            fi
+            # ruby/setup-ruby installed Bundler 2.6.9 globally and restored gems to vendor/bundle
+            # Use the global bundler but ensure it uses the vendored gems
+            export BUNDLE_GEMFILE="$(pwd)/Gemfile"
+            export BUNDLE_PATH="$(pwd)/vendor/bundle"
+            
+            # Run pod install via bundler
+            bundle exec pod install --repo-update
           else
             pod install --repo-update
           fi
@@ -650,15 +683,13 @@ jobs:
         run: |
           echo "== Install iOS Pods (build job): pod install (repo update) =="
           if [ -f Gemfile ]; then
-            # Use the vendor Bundler directly to avoid system Bundler interference
-            VENDOR_BUNDLER="$(pwd)/vendor/bundle/ruby/3.2.0/bin/bundle"
-            if [ -f "$VENDOR_BUNDLER" ]; then
-              echo "Using vendor Bundler: $VENDOR_BUNDLER"
-              BUNDLE_GEMFILE="$(pwd)/Gemfile" "$VENDOR_BUNDLER" exec pod install --repo-update
-            else
-              echo "Vendor bundler not found, falling back to system bundle exec"
-              bundle exec pod install --repo-update
-            fi
+            # ruby/setup-ruby installed Bundler 2.6.9 globally and restored gems to vendor/bundle
+            # Use the global bundler but ensure it uses the vendored gems
+            export BUNDLE_GEMFILE="$(pwd)/Gemfile"
+            export BUNDLE_PATH="$(pwd)/vendor/bundle"
+            
+            # Run pod install via bundler
+            bundle exec pod install --repo-update
           else
             pod install --repo-update
           fi
