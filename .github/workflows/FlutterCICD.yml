@@ -142,6 +142,24 @@ jobs:
             unset GEM_PATH
             export BUNDLE_GEMFILE="$(pwd)/Gemfile"
             export BUNDLE_PATH="$(pwd)/vendor/bundle"
+            echo "=== Debug: Ruby/Bundler environment (Phase 3) ==="
+            echo "PATH: $PATH"
+            which ruby
+            ruby -v
+            which bundle
+            bundle -v
+            echo "--- bundle config list ---"
+            bundle config list || true
+            echo "--- bundle env ---"
+            bundle env || true
+            echo "--- gem env ---"
+            gem env || true
+            echo "--- GEM_* environment ---"
+            env | grep '^GEM_' || true
+            echo "--- BUNDLE_* environment ---"
+            env | grep '^BUNDLE_' || true
+            echo "--- ios/vendor/bundle contents ---"
+            ls -al $(pwd)/vendor/bundle || true
             bundle config set --local path "$BUNDLE_PATH"
             bundle config set --local disable_shared_gems true
             bundle check || bundle install --jobs 4 --retry 3
@@ -379,6 +397,24 @@ jobs:
             unset GEM_PATH
             export BUNDLE_GEMFILE="$(pwd)/Gemfile"
             export BUNDLE_PATH="$(pwd)/vendor/bundle"
+            echo "=== Debug: Ruby/Bundler environment (Build job) ==="
+            echo "PATH: $PATH"
+            which ruby
+            ruby -v
+            which bundle
+            bundle -v
+            echo "--- bundle config list ---"
+            bundle config list || true
+            echo "--- bundle env ---"
+            bundle env || true
+            echo "--- gem env ---"
+            gem env || true
+            echo "--- GEM_* environment ---"
+            env | grep '^GEM_' || true
+            echo "--- BUNDLE_* environment ---"
+            env | grep '^BUNDLE_' || true
+            echo "--- ios/vendor/bundle contents ---"
+            ls -al $(pwd)/vendor/bundle || true
             bundle config set --local path "$BUNDLE_PATH"
             bundle config set --local disable_shared_gems true
             bundle check || bundle install --jobs 4 --retry 3
