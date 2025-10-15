@@ -142,6 +142,13 @@ jobs:
             unset GEM_PATH
             export BUNDLE_GEMFILE="$(pwd)/Gemfile"
             export BUNDLE_PATH="$(pwd)/vendor/bundle"
+            mkdir -p "$BUNDLE_PATH"
+            CLEAN_PATH=$(python3 -c 'import os, sys; parts=[]; [parts.append(p) for p in os.environ.get("PATH", "").split(":") if not p.startswith("/opt/homebrew") and p not in parts]; sys.stdout.write(":".join(parts))')
+            export PATH="$BUNDLE_PATH/bin:$CLEAN_PATH"
+            unset RUBYLIB
+            unset RUBYOPT
+            export GEM_HOME="$BUNDLE_PATH"
+            export GEM_PATH="$BUNDLE_PATH"
             echo "=== Debug: Ruby/Bundler environment (Phase 3) ==="
             echo "PATH: $PATH"
             which ruby
@@ -398,6 +405,13 @@ jobs:
             unset GEM_PATH
             export BUNDLE_GEMFILE="$(pwd)/Gemfile"
             export BUNDLE_PATH="$(pwd)/vendor/bundle"
+            mkdir -p "$BUNDLE_PATH"
+            CLEAN_PATH=$(python3 -c 'import os, sys; parts=[]; [parts.append(p) for p in os.environ.get("PATH", "").split(":") if not p.startswith("/opt/homebrew") and p not in parts]; sys.stdout.write(":".join(parts))')
+            export PATH="$BUNDLE_PATH/bin:$CLEAN_PATH"
+            unset RUBYLIB
+            unset RUBYOPT
+            export GEM_HOME="$BUNDLE_PATH"
+            export GEM_PATH="$BUNDLE_PATH"
             echo "=== Debug: Ruby/Bundler environment (Build job) ==="
             echo "PATH: $PATH"
             which ruby
@@ -690,6 +704,13 @@ jobs:
             unset GEM_PATH
             export BUNDLE_GEMFILE="$(pwd)/Gemfile"
             export BUNDLE_PATH="$(pwd)/vendor/bundle"
+            mkdir -p "$BUNDLE_PATH"
+            CLEAN_PATH=$(python3 -c 'import os, sys; parts=[]; [parts.append(p) for p in os.environ.get("PATH", "").split(":") if not p.startswith("/opt/homebrew") and p not in parts]; sys.stdout.write(":".join(parts))')
+            export PATH="$BUNDLE_PATH/bin:$CLEAN_PATH"
+            unset RUBYLIB
+            unset RUBYOPT
+            export GEM_HOME="$BUNDLE_PATH"
+            export GEM_PATH="$BUNDLE_PATH"
             bundle config set --local path "$BUNDLE_PATH"
             bundle config set --local disable_shared_gems true
             bundle config set --local force_ruby_platform true
