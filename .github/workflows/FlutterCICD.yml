@@ -36,6 +36,7 @@ jobs:
         with:
           ruby-version: "3.2"
           bundler-cache: true
+          working-directory: ios
 
       # ===== Java/JDK Setup (for Android builds) =====
       - name: Set up JDK
@@ -120,9 +121,16 @@ jobs:
         run: |
           echo "== Phase 3: pod install (repo update) =="
           cd ios
+          # Ensure Bundler uses the ios/Gemfile and installs into ios/vendor/bundle
+          if [ -f Gemfile ]; then
+            export BUNDLE_GEMFILE=$(pwd)/Gemfile
+            export BUNDLE_PATH=$(pwd)/vendor/bundle
+          fi
           # Use bundle exec to ensure correct CocoaPods version
           if [ -f Gemfile ]; then
-            bundle install --jobs 4 --retry 3
+            # install gems into ./vendor/bundle so bundle exec below can find them
+            bundle config set --local path 'vendor/bundle'
+            bundle install --jobs 4 --retry 3 --path vendor/bundle
             bundle exec pod install --repo-update
           else
             pod install --repo-update
@@ -249,7 +257,7 @@ jobs:
           echo "MATCH_GIT_URL=${{ secrets.MATCH_GIT_URL }}" >> $GITHUB_ENV
           echo "MATCH_GIT_BRANCH=${{ secrets.MATCH_GIT_BRANCH }}" >> $GITHUB_ENV
 
-          echo "iOS signing environment prepared (MATCH_TYPE=${{ env.MATCH_TYPE }}) ✓"
+          echo "iOS signing environment prepared (MATCH_TYPE=$MATCH_TYPE) ✓"
         env:
           FLAVOR: ${{ env.FLAVOR }}
 
@@ -302,7 +310,8 @@ jobs:
         run: |
           cd android
           if [ -f Gemfile ]; then
-            bundle install --jobs 4 --retry 3
+            bundle config set --local path 'vendor/bundle'
+            bundle install --jobs 4 --retry 3 --path vendor/bundle
           fi
 
       - name: Build Android (flavor from branch)
@@ -343,12 +352,15 @@ jobs:
         with:
           ruby-version: "2.7"
           bundler-cache: true
+          working-directory: ios
 
       - name: Install Fastlane gems (iOS)
         run: |
           cd ios
           if [ -f Gemfile ]; then
-            bundle install --jobs 4 --retry 3
+            # install gems into ./vendor/bundle to keep them local to the ios directory
+            bundle config set --local path 'vendor/bundle'
+            bundle install --jobs 4 --retry 3 --path vendor/bundle
           fi
 
       - name: Install iOS Pods (build job)
@@ -356,7 +368,9 @@ jobs:
           echo "== Install iOS Pods (build job): pod install (repo update) =="
           cd ios
           if [ -f Gemfile ]; then
-            bundle install --jobs 4 --retry 3
+            # ensure bundler installs into ./vendor/bundle and then run pod install via bundle exec
+            bundle config set --local path 'vendor/bundle'
+            bundle install --jobs 4 --retry 3 --path vendor/bundle
             bundle exec pod install --repo-update
           else
             pod install --repo-update
@@ -575,7 +589,8 @@ jobs:
         run: |
           cd android
           if [ -f Gemfile ]; then
-            bundle install --jobs 4 --retry 3
+            bundle config set --local path 'vendor/bundle'
+            bundle install --jobs 4 --retry 3 --path vendor/bundle
           fi
 
       - name: Build Android (prod)
@@ -620,7 +635,8 @@ jobs:
         run: |
           cd ios
           if [ -f Gemfile ]; then
-            bundle install --jobs 4 --retry 3
+            bundle config set --local path 'vendor/bundle'
+            bundle install --jobs 4 --retry 3 --path vendor/bundle
           fi
 
       - name: Install iOS Pods (build job)
@@ -628,7 +644,11 @@ jobs:
           echo "== Install iOS Pods (build job): pod install (repo update) =="
           cd ios
           if [ -f Gemfile ]; then
-            bundle install --jobs 4 --retry 3
+            # ensure Bundler uses ios/Gemfile and installs into ios/vendor/bundle
+            export BUNDLE_GEMFILE=$(pwd)/Gemfile
+            export BUNDLE_PATH=$(pwd)/vendor/bundle
+            bundle config set --local path 'vendor/bundle'
+            bundle install --jobs 4 --retry 3 --path vendor/bundle
             bundle exec pod install --repo-update
           else
             pod install --repo-update
