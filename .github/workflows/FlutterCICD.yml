@@ -138,55 +138,25 @@ jobs:
         run: |
           echo "== Phase 3: pod install (repo update) =="
 
-          # DEBUG: Show what's actually in vendor/bundle
-          echo "=== DEBUG: Checking vendor/bundle contents ==="
-          echo "PWD: $(pwd)"
-          if [ -d "vendor/bundle" ]; then
-            echo "vendor/bundle directory EXISTS"
-            echo "Size: $(du -sh vendor/bundle)"
-            echo "Contents of vendor/bundle:"
-            ls -la vendor/bundle/ || true
-            if [ -d "vendor/bundle/ruby" ]; then
-              echo "Ruby subdirectories:"
-              ls -la vendor/bundle/ruby/ || true
-              echo "Gem directories (if any):"
-              find vendor/bundle/ruby -type d -name "gems" -exec ls -la {} \; || true
-              echo "Sample gems (first 10):"
-              find vendor/bundle/ruby -type d -path "*/gems/*" -maxdepth 4 | head -10 || true
-            fi
-          else
-            echo "WARNING: vendor/bundle directory DOES NOT EXIST!"
-          fi
-
-          # DEBUG: Check bundle config
-          echo "=== DEBUG: Bundle configuration ==="
-          bundle config list || true
-
           if [ -f Gemfile ]; then
             # ruby/setup-ruby installed Bundler 2.6.9 globally and restored gems to vendor/bundle
             # Use the global bundler but ensure it uses the vendored gems
             export BUNDLE_GEMFILE="$(pwd)/Gemfile"
             export BUNDLE_PATH="$(pwd)/vendor/bundle"
             
-            # Verify bundler version
-            echo "=== DEBUG: Bundler environment ==="
+            # Verify setup
             echo "Using Bundler: $(bundle --version)"
             echo "Ruby: $(ruby --version)"
-            echo "BUNDLE_GEMFILE=$BUNDLE_GEMFILE"
-            echo "BUNDLE_PATH=$BUNDLE_PATH"
-            echo "Which bundle: $(which bundle)"
             
-            # Try to list gems that bundler sees
-            echo "=== DEBUG: Gems visible to bundler ==="
-            bundle list || echo "bundle list failed"
-            
-            # Run pod install via bundler
-            bundle exec pod install --repo-update
+            # Run bundle exec with explicit ruby that disables site directory loading
+            # This prevents Homebrew Ruby's rubygems from being loaded
+            /Users/runner/hostedtoolcache/Ruby/3.2.9/arm64/bin/ruby \
+              --disable=did_you_mean \
+              /Users/runner/hostedtoolcache/Ruby/3.2.9/arm64/bin/bundle \
+              exec pod install --repo-update
           else
             pod install --repo-update
-          fi
-
-          echo "== Pod install exit: $? "
+          fi          echo "== Pod install exit: $? "
           # Basic sanity checks - fail the job if required Pod support files for flavors are missing
           MISSING=0
           REQUIRED_FILES=(
@@ -416,8 +386,11 @@ jobs:
             export BUNDLE_GEMFILE="$(pwd)/Gemfile"
             export BUNDLE_PATH="$(pwd)/vendor/bundle"
             
-            # Run pod install via bundler
-            bundle exec pod install --repo-update
+            # Run bundle exec with explicit ruby that disables site directory loading
+            /Users/runner/hostedtoolcache/Ruby/3.2.9/arm64/bin/ruby \
+              --disable=did_you_mean \
+              /Users/runner/hostedtoolcache/Ruby/3.2.9/arm64/bin/bundle \
+              exec pod install --repo-update
           else
             pod install --repo-update
           fi
@@ -688,8 +661,11 @@ jobs:
             export BUNDLE_GEMFILE="$(pwd)/Gemfile"
             export BUNDLE_PATH="$(pwd)/vendor/bundle"
             
-            # Run pod install via bundler
-            bundle exec pod install --repo-update
+            # Run bundle exec with explicit ruby that disables site directory loading
+            /Users/runner/hostedtoolcache/Ruby/3.2.9/arm64/bin/ruby \
+              --disable=did_you_mean \
+              /Users/runner/hostedtoolcache/Ruby/3.2.9/arm64/bin/bundle \
+              exec pod install --repo-update
           else
             pod install --repo-update
           fi
