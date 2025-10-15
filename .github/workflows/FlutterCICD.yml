@@ -120,9 +120,10 @@ jobs:
         run: |
           echo "== Phase 3: pod install (repo update) =="
           cd ios
-          # Use bundle exec to ensure correct CocoaPods version
           if [ -f Gemfile ]; then
-            # bundler-cache from ruby/setup-ruby already installed gems, just run pod install
+            export RUBYLIB=""
+            bundle config set --local path 'vendor/bundle'
+            bundle install --jobs 4 --retry 3
             bundle exec pod install --repo-update
           else
             pod install --repo-update
@@ -360,7 +361,9 @@ jobs:
           echo "== Install iOS Pods (build job): pod install (repo update) =="
           cd ios
           if [ -f Gemfile ]; then
-            # bundler-cache from ruby/setup-ruby already installed gems, just run pod install
+            export RUBYLIB=""
+            bundle config set --local path 'vendor/bundle'
+            bundle install --jobs 4 --retry 3
             bundle exec pod install --repo-update
           else
             pod install --repo-update
@@ -634,7 +637,9 @@ jobs:
           echo "== Install iOS Pods (build job): pod install (repo update) =="
           cd ios
           if [ -f Gemfile ]; then
-            # bundler-cache from ruby/setup-ruby already installed gems, just run pod install
+            export RUBYLIB=""
+            bundle config set --local path 'vendor/bundle'
+            bundle install --jobs 4 --retry 3
             bundle exec pod install --repo-update
           else
             pod install --repo-update
