@@ -47,6 +47,13 @@ jobs:
           java-version: "17"
 
       # ===== Caching =====
+      - name: Cache Bundler gems
+        uses: actions/cache@v4
+        with:
+          path: ios/vendor/bundle
+          key: ${{ runner.os }}-gems-ios-${{ hashFiles('ios/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-ios-
       - name: Cache pub dependencies
         uses: actions/cache@v4
         with:
@@ -299,6 +306,16 @@ jobs:
 
           echo "Android keystore environment configured ✓"
 
+      - name: Cache Bundler gems
+        uses: actions/cache@v4
+        with:
+          path: |
+            ios/vendor/bundle
+            android/vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-
+
       - name: Cache Gradle dependencies
         uses: actions/cache@v3
         with:
@@ -313,23 +330,152 @@ jobs:
         run: |
           cd android
           echo "Building Android flavor: $FLAVOR"
-          bundle exec fastlane build flavor:$FLAV
+          bundle exec fastlane build flavor:$FLAVOR
+        env:
+          BUILD_NAME: 1.0.0
+          BUILD_NUMBER: ${{ github.run_number }}
+          KEYSTORE_FILE: ${{ env.KEYSTORE_FILE }}
+          KEYSTORE_PASSWORD: ${{ env.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ env.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ env.KEY_PASSWORD }}
 
-  # Phase 6 — Prod builds - deploy to App Store / Play Store
+      - name: Upload Android to Play Store
+        if: steps.determine_flavor.outputs.flavor == 'qa' || steps.determine_flavor.outputs.flavor == 'staging'
+        run: |
+          cd android
+          echo "Uploading Android flavor: $FLAVOR to Play Store Internal track"
+          bundle exec fastlane upload flavor:$FLAVOR
+        env:
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_QA: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_QA }}
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_STAGING: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_STAGING }}
+
+      - name: Upload Android artifacts (AAB + mapping)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: android-${{ steps.determine_flavor.outputs.flavor }}-${{ github.run_number }}
+          path: |
+            android/app/build/outputs/bundle/**/*.aab
+            android/app/build/outputs/mapping/**/*.txt
+          retention-days: 30
+
+      - name: Install iOS Pods (build job)
+        run: |
+          echo "== Install iOS Pods (build job): pod install (repo update) =="
+          cd ios
+          if [ -f Gemfile ]; then
+            # bundler-cache from ruby/setup-ruby already installed gems, just run pod install
+            bundle exec pod install --repo-update
+          else
+            pod install --repo-update
+          fi
+
+          echo "Install iOS Pods (build job) completed: pods installed ✓"
+
+      - name: Run Fastlane Match (iOS)
+        run: |
+          cd ios
+          echo "Fetching certificates via Match (type: $MATCH_TYPE)"
+          bundle exec fastlane fetch_certificates
+        env:
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_GIT_BRANCH: ${{ secrets.MATCH_GIT_BRANCH }}
+          MATCH_TYPE: ${{ env.MATCH_TYPE }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+
+      - name: Phase 4a - Signing sanity checks (debug)
+        if: always()
+        run: |
+          echo "== Signing debug: env = =="
+          echo "MATCH_TYPE=${MATCH_TYPE}"
+          echo "MATCH_GIT_URL=${MATCH_GIT_URL}"
+          echo "MATCH_GIT_BRANCH=${MATCH_GIT_BRANCH}"
+          echo "GIT_SSH_COMMAND=${GIT_SSH_COMMAND}"
+
+          echo "== Ensure build.keychain is in search list =="
+          security list-keychains -d user -s build.keychain login.keychain || true
+
+          echo "== Unlock keychain =="
+          security unlock-keychain -p "" build.keychain || true
+
+          echo "== (Optional) set key partition list (may require password) =="
+          security set-key-partition-list -S apple-tool:,apple: -s -k "" ~/Library/Keychains/build.keychain-db || echo "set-key-partition-list failed (ok if keys already accessible)"
+
+          echo "== List keychains =="
+          security list-keychains -d user
+
+          echo "== Show signing identities (build.keychain) =="
+          security find-identity -v -p codesigning ~/Library/Keychains/build.keychain-db || security find-identity -v -p codesigning
+
+          echo "== List provisioning profiles =="
+          ls -la ~/Library/MobileDevice/Provisioning\ Profiles || true
+
+          echo "== Verify SSH/Git access to match repo =="
+          GIT_SSH_COMMAND="ssh -i ~/.ssh/match_deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no" \
+            git ls-remote "${MATCH_GIT_URL}" refs/heads/"${MATCH_GIT_BRANCH}" || true
+
+          echo "== Xcode version =="
+          xcodebuild -version || true
+
+        env:
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_GIT_BRANCH: ${{ secrets.MATCH_GIT_BRANCH }}
+          MATCH_TYPE: ${{ env.MATCH_TYPE }}
+
+      - name: Build iOS (flavor from branch)
+        run: |
+          cd ios
+          echo "Building iOS flavor: $FLAVOR"
+          bundle exec fastlane build flavor:$FLAVOR
+        env:
+          BUILD_NAME: 1.0.0
+          BUILD_NUMBER: ${{ github.run_number }}
+          MATCH_TYPE: ${{ env.MATCH_TYPE }}
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+
+      - name: Upload iOS to TestFlight
+        if: steps.determine_flavor.outputs.flavor == 'qa' || steps.determine_flavor.outputs.flavor == 'staging'
+        run: |
+          cd ios
+          echo "Uploading iOS flavor: $FLAVOR to TestFlight (Internal)"
+          bundle exec fastlane upload flavor:$FLAVOR
+        env:
+          MATCH_TYPE: ${{ env.MATCH_TYPE }}
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+
+      - name: Upload iOS artifacts (IPA + dSYM)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ios-${{ steps.determine_flavor.outputs.flavor }}-${{ github.run_number }}
+          path: |
+            ios/build/*.ipa
+            ios/build/*.dSYM.zip
+          retention-days: 30
+
+  # Phase 5 — Production builds - gated with manual approval
   build-prod:
     needs: prepare-and-test
-    # Only run for prod branches
+    # Only run for prod branch
     if: >
       needs.prepare-and-test.result == 'success' &&
       (
-        (github.event_name == 'push' && github.ref == 'refs/heads/mobile-prod')
+        (github.event_name == 'push' &&
+         github.ref == 'refs/heads/mobile-prod'
+        )
         ||
         (github.event_name == 'pull_request' &&
          github.event.pull_request.head.repo.full_name == github.repository &&
-         github.event.pull_request.head.ref == 'mobile-prod')
+         github.event.pull_request.head.ref == 'mobile-prod'
+        )
       )
     runs-on: macos-latest
-    environment: production
+    environment: release
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -365,22 +511,26 @@ jobs:
           name: mobile-test-results-${{ github.run_number }}
           path: coverage/
 
-      # ===== Phase 4 — iOS Code Signing Setup =====
-      - name: Phase 4a - Set up iOS signing (Fastlane Match)
+      - name: Determine flavor from branch
+        id: determine_flavor
         run: |
-          echo "== Phase 4a: iOS Code Signing Setup =="
+          # For prod, always set flavor to prod
+          echo "FLAVOR=prod" >> $GITHUB_ENV
+          echo "flavor=prod" >> $GITHUB_OUTPUT
+          echo "Branch: mobile-prod, Flavor: prod"
+
+      # ===== Phase 4 — iOS Code Signing Setup (Prod) =====
+      - name: Phase 4a - Set up iOS signing (Fastlane Match - appstore)
+        run: |
+          echo "== Phase 4a: iOS Code Signing Setup (PROD) =="
           # Create ephemeral keychain for code signing
           security create-keychain -p "" build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p "" build.keychain
           security set-keychain-settings -t 3600 -u build.keychain
 
-          # Set match type based on flavor (non-prod = adhoc, prod = appstore)
-          if [[ "$FLAVOR" == "prod" ]]; then
-            echo "MATCH_TYPE=appstore" >> $GITHUB_ENV
-          else
-            echo "MATCH_TYPE=adhoc" >> $GITHUB_ENV
-          fi
+          # Set match type for prod (appstore)
+          echo "MATCH_TYPE=appstore" >> $GITHUB_ENV
 
           # Decode and configure SSH key for Match git access
           mkdir -p ~/.ssh
@@ -396,20 +546,18 @@ jobs:
           echo "MATCH_GIT_URL=${{ secrets.MATCH_GIT_URL }}" >> $GITHUB_ENV
           echo "MATCH_GIT_BRANCH=${{ secrets.MATCH_GIT_BRANCH }}" >> $GITHUB_ENV
 
-          echo "iOS signing environment prepared (MATCH_TYPE=$MATCH_TYPE) ✓"
-        env:
-          FLAVOR: ${{ env.FLAVOR }}
+          echo "iOS signing environment prepared (MATCH_TYPE=appstore) ✓"
 
       # ===== Phase 4b — Android Keystore Setup (Prod) =====
       - name: Phase 4b - Set up Android keystore (prod)
         run: |
           echo "== Phase 4b: Android Keystore Setup (PROD) =="
-          # Use prod keystore for release
-          echo "${{ secrets.ANDROID_KEYSTORE_PROD_BASE64 }}" | base64 --decode > android/petra-prod-key.jks
+          # Use prod keystore
+          echo "${{ secrets.ANDROID_KEYSTORE_PROD_BASE64 }}" | base64 --decode > android/petra-release-key.jks
           EXPECTED_SHA="${{ secrets.ANDROID_KEYSTORE_PROD_SHA256 }}"
 
           # Verify keystore SHA256 fingerprint
-          ACTUAL_SHA=$(shasum -a 256 android/petra-prod-key.jks | awk '{print $1}')
+          ACTUAL_SHA=$(shasum -a 256 android/petra-release-key.jks | awk '{print $1}')
           echo "PROD Keystore SHA256: $ACTUAL_SHA"
 
           if [[ "$ACTUAL_SHA" != "$EXPECTED_SHA" ]]; then
@@ -422,12 +570,22 @@ jobs:
           echo "Keystore verification passed ✓"
 
           # Set signing environment variables for Gradle
-          echo "KEYSTORE_FILE=petra-prod-key.jks" >> $GITHUB_ENV
+          echo "KEYSTORE_FILE=petra-release-key.jks" >> $GITHUB_ENV
           echo "KEYSTORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PROD_STORE_PASSWORD }}" >> $GITHUB_ENV
           echo "KEY_ALIAS=${{ secrets.ANDROID_KEYSTORE_PROD_KEY_ALIAS }}" >> $GITHUB_ENV
           echo "KEY_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PROD_KEY_PASSWORD }}" >> $GITHUB_ENV
 
           echo "Android keystore environment configured ✓"
+
+      - name: Cache Bundler gems
+        uses: actions/cache@v4
+        with:
+          path: |
+            ios/vendor/bundle
+            android/vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-
 
       - name: Cache Gradle dependencies
         uses: actions/cache@v4
@@ -442,16 +600,127 @@ jobs:
       - name: Build Android (prod)
         run: |
           cd android
-          echo "Building Android prod release"
-          bundle exec fastlane release
+          echo "Building Android flavor: prod"
+          bundle exec fastlane build flavor:prod
+        env:
+          BUILD_NAME: 1.0.0
+          BUILD_NUMBER: ${{ github.run_number }}
+          KEYSTORE_FILE: ${{ env.KEYSTORE_FILE }}
+          KEYSTORE_PASSWORD: ${{ env.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ env.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ env.KEY_PASSWORD }}
+
+      - name: Upload Android to Play Store (production track)
+        run: |
+          cd android
+          echo "Uploading Android prod to Play Store production track"
+          bundle exec fastlane upload flavor:prod
+        env:
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_PROD: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_PROD }}
+
+      - name: Upload Android artifacts (AAB + mapping)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: android-prod-${{ github.run_number }}
+          path: |
+            android/app/build/outputs/bundle/**/*.aab
+            android/app/build/outputs/mapping/**/*.txt
+          retention-days: 90
 
       - name: Install iOS Pods (build job)
         run: |
+          echo "== Install iOS Pods (build job): pod install (repo update) =="
           cd ios
-          echo "Installing iOS pods for release"
           if [ -f Gemfile ]; then
-            # Use bundler exec if Gemfile is present
+            # bundler-cache from ruby/setup-ruby already installed gems, just run pod install
             bundle exec pod install --repo-update
           else
             pod install --repo-update
           fi
+
+          echo "Install iOS Pods (build job) completed: pods installed ✓"
+
+      - name: Run Fastlane Match (iOS - appstore)
+        run: |
+          cd ios
+          echo "Fetching certificates via Match (type: appstore)"
+          bundle exec fastlane fetch_certificates
+        env:
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_GIT_BRANCH: ${{ secrets.MATCH_GIT_BRANCH }}
+          MATCH_TYPE: appstore
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+
+      - name: Phase 4a - Signing sanity checks (debug)
+        if: always()
+        run: |
+          echo "== Signing debug: env = =="
+          echo "MATCH_TYPE=${MATCH_TYPE}"
+          echo "MATCH_GIT_URL=${MATCH_GIT_URL}"
+          echo "MATCH_GIT_BRANCH=${MATCH_GIT_BRANCH}"
+          echo "GIT_SSH_COMMAND=${GIT_SSH_COMMAND}"
+
+          echo "== Ensure build.keychain is in search list =="
+          security list-keychains -d user -s build.keychain login.keychain || true
+
+          echo "== Unlock keychain =="
+          security unlock-keychain -p "" build.keychain || true
+
+          echo "== (Optional) set key partition list (may require password) =="
+          security set-key-partition-list -S apple-tool:,apple: -s -k "" ~/Library/Keychains/build.keychain-db || echo "set-key-partition-list failed (ok if keys already accessible)"
+
+          echo "== List keychains =="
+          security list-keychains -d user
+
+          echo "== Show signing identities (build.keychain) =="
+          security find-identity -v -p codesigning ~/Library/Keychains/build.keychain-db || security find-identity -v -p codesigning
+
+          echo "== List provisioning profiles =="
+          ls -la ~/Library/MobileDevice/Provisioning\ Profiles || true
+
+          echo "== Verify SSH/Git access to match repo =="
+          GIT_SSH_COMMAND="ssh -i ~/.ssh/match_deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no" \
+            git ls-remote "${MATCH_GIT_URL}" refs/heads/"${MATCH_GIT_BRANCH}" || true
+
+          echo "== Xcode version =="
+          xcodebuild -version || true
+
+        env:
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_GIT_BRANCH: ${{ secrets.MATCH_GIT_BRANCH }}
+          MATCH_TYPE: appstore
+
+      - name: Build iOS (prod)
+        run: |
+          cd ios
+          echo "Building iOS flavor: prod"
+          bundle exec fastlane build flavor:prod
+        env:
+          BUILD_NAME: 1.0.0
+          BUILD_NUMBER: ${{ github.run_number }}
+          MATCH_TYPE: appstore
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+
+      - name: Upload iOS to TestFlight/App Store
+        run: |
+          cd ios
+          echo "Uploading iOS prod to TestFlight/App Store"
+          bundle exec fastlane upload flavor:prod
+        env:
+          MATCH_TYPE: appstore
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+
+      - name: Upload iOS artifacts (IPA + dSYM)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ios-prod-${{ github.run_number }}
+          path: |
+            ios/build/*.ipa
+            ios/build/*.dSYM.zip
+          retention-days: 90
