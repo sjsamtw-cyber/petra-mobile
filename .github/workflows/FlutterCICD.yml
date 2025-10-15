@@ -32,10 +32,27 @@ jobs:
           architecture: "arm64"
 
       # ===== Ruby, Bundler & Fastlane Setup =====
-      - name: Set up Ruby
+      - name: Set up Ruby (global)
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.2"
+          bundler: "2.6.9"
+
+      - name: Prepare iOS Bundler environment (cached)
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+          bundler: "2.6.9"
+          bundler-cache: true
+          working-directory: ios
+
+      - name: Prepare Android Bundler environment (cached)
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+          bundler: "2.6.9"
+          bundler-cache: true
+          working-directory: android
 
       # ===== Java/JDK Setup (for Android builds) =====
       - name: Set up JDK
@@ -121,9 +138,13 @@ jobs:
           echo "== Phase 3: pod install (repo update) =="
           cd ios
           if [ -f Gemfile ]; then
-            export RUBYLIB=""
-            bundle config set --local path 'vendor/bundle'
-            bundle install --jobs 4 --retry 3
+            unset GEM_HOME
+            unset GEM_PATH
+            export BUNDLE_GEMFILE="$(pwd)/Gemfile"
+            export BUNDLE_PATH="$(pwd)/vendor/bundle"
+            bundle config set --local path "$BUNDLE_PATH"
+            bundle config set --local disable_shared_gems true
+            bundle check || bundle install --jobs 4 --retry 3
             bundle exec pod install --repo-update
           else
             pod install --repo-update
@@ -193,24 +214,27 @@ jobs:
           cache: true
           architecture: "arm64"
 
-      - name: Set up Ruby
+      - name: Set up Ruby (global)
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.2"
+          bundler: "2.6.9"
 
-      - name: Cache and install Bundler dependencies
-        uses: actions/cache@v4
+      - name: Prepare iOS Bundler environment (cached)
+        uses: ruby/setup-ruby@v1
         with:
-          path: |
-            android/vendor/bundle
-            ios/vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('android/Gemfile.lock', 'ios/Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-gems-
-      - name: Install Bundler dependencies
-        run: |
-          bundle install --gemfile=android/Gemfile --path=android/vendor/bundle --jobs=4
-          bundle install --gemfile=ios/Gemfile --path=ios/vendor/bundle --jobs=4
+          ruby-version: "3.2"
+          bundler: "2.6.9"
+          bundler-cache: true
+          working-directory: ios
+
+      - name: Prepare Android Bundler environment (cached)
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+          bundler: "2.6.9"
+          bundler-cache: true
+          working-directory: android
 
       - name: Download test artifacts
         uses: actions/download-artifact@v4
@@ -303,16 +327,6 @@ jobs:
 
           echo "Android keystore environment configured ✓"
 
-      - name: Cache Bundler gems
-        uses: actions/cache@v4
-        with:
-          path: |
-            ios/vendor/bundle
-            android/vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-gems-
-
       - name: Cache Gradle dependencies
         uses: actions/cache@v3
         with:
@@ -361,9 +375,13 @@ jobs:
           echo "== Install iOS Pods (build job): pod install (repo update) =="
           cd ios
           if [ -f Gemfile ]; then
-            export RUBYLIB=""
-            bundle config set --local path 'vendor/bundle'
-            bundle install --jobs 4 --retry 3
+            unset GEM_HOME
+            unset GEM_PATH
+            export BUNDLE_GEMFILE="$(pwd)/Gemfile"
+            export BUNDLE_PATH="$(pwd)/vendor/bundle"
+            bundle config set --local path "$BUNDLE_PATH"
+            bundle config set --local disable_shared_gems true
+            bundle check || bundle install --jobs 4 --retry 3
             bundle exec pod install --repo-update
           else
             pod install --repo-update
@@ -490,24 +508,27 @@ jobs:
           cache: true
           architecture: "arm64"
 
-      - name: Set up Ruby
+      - name: Set up Ruby (global)
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.2"
+          bundler: "2.6.9"
 
-      - name: Cache and install Bundler dependencies
-        uses: actions/cache@v4
+      - name: Prepare iOS Bundler environment (cached)
+        uses: ruby/setup-ruby@v1
         with:
-          path: |
-            android/vendor/bundle
-            ios/vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('android/Gemfile.lock', 'ios/Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-gems-
-      - name: Install Bundler dependencies
-        run: |
-          bundle install --gemfile=android/Gemfile --path=android/vendor/bundle --jobs=4
-          bundle install --gemfile=ios/Gemfile --path=ios/vendor/bundle --jobs=4
+          ruby-version: "3.2"
+          bundler: "2.6.9"
+          bundler-cache: true
+          working-directory: ios
+
+      - name: Prepare Android Bundler environment (cached)
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+          bundler: "2.6.9"
+          bundler-cache: true
+          working-directory: android
 
       - name: Download test artifacts
         uses: actions/download-artifact@v4
@@ -581,16 +602,6 @@ jobs:
 
           echo "Android keystore environment configured ✓"
 
-      - name: Cache Bundler gems
-        uses: actions/cache@v4
-        with:
-          path: |
-            ios/vendor/bundle
-            android/vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-gems-
-
       - name: Cache Gradle dependencies
         uses: actions/cache@v4
         with:
@@ -637,9 +648,13 @@ jobs:
           echo "== Install iOS Pods (build job): pod install (repo update) =="
           cd ios
           if [ -f Gemfile ]; then
-            export RUBYLIB=""
-            bundle config set --local path 'vendor/bundle'
-            bundle install --jobs 4 --retry 3
+            unset GEM_HOME
+            unset GEM_PATH
+            export BUNDLE_GEMFILE="$(pwd)/Gemfile"
+            export BUNDLE_PATH="$(pwd)/vendor/bundle"
+            bundle config set --local path "$BUNDLE_PATH"
+            bundle config set --local disable_shared_gems true
+            bundle check || bundle install --jobs 4 --retry 3
             bundle exec pod install --repo-update
           else
             pod install --repo-update
