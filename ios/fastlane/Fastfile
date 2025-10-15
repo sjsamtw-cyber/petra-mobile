@@ -36,6 +36,16 @@ platform :ios do
       'dev'
     end
     
+    # Disable automatic code signing for Release builds (use manual signing with match profiles)
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "Runner.xcodeproj",
+      code_sign_identity: "Apple Distribution",
+      profile_name: ENV['MATCH_TYPE'] == 'appstore' ? "match AppStore com.petrasoftsolutions.mobile.#{flavor}" : "match AdHoc com.petrasoftsolutions.mobile.#{flavor}",
+      bundle_identifier: "com.petrasoftsolutions.mobile.#{flavor}",
+      build_configurations: ["Release-#{flavor}"]
+    )
+    
     # Build with xcodebuild (signed)
     build_ios_app(
       scheme: scheme_name,

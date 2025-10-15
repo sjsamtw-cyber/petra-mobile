@@ -362,6 +362,45 @@ jobs:
           MATCH_TYPE: ${{ env.MATCH_TYPE }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
 
+      - name: Phase 4a - Signing sanity checks (debug)
+        if: always()
+        run: |
+          echo "== Signing debug: env = =="
+          echo "MATCH_TYPE=${MATCH_TYPE}"
+          echo "MATCH_GIT_URL=${MATCH_GIT_URL}"
+          echo "MATCH_GIT_BRANCH=${MATCH_GIT_BRANCH}"
+          echo "GIT_SSH_COMMAND=${GIT_SSH_COMMAND}"
+
+          echo "== Ensure build.keychain is in search list =="
+          security list-keychains -d user -s build.keychain login.keychain || true
+
+          echo "== Unlock keychain =="
+          security unlock-keychain -p "" build.keychain || true
+
+          echo "== (Optional) set key partition list (may require password) =="
+          security set-key-partition-list -S apple-tool:,apple: -s -k "" ~/Library/Keychains/build.keychain-db || echo "set-key-partition-list failed (ok if keys already accessible)"
+
+          echo "== List keychains =="
+          security list-keychains -d user
+
+          echo "== Show signing identities (build.keychain) =="
+          security find-identity -v -p codesigning ~/Library/Keychains/build.keychain-db || security find-identity -v -p codesigning
+
+          echo "== List provisioning profiles =="
+          ls -la ~/Library/MobileDevice/Provisioning\ Profiles || true
+
+          echo "== Verify SSH/Git access to match repo =="
+          GIT_SSH_COMMAND="ssh -i ~/.ssh/match_deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no" \
+            git ls-remote "${MATCH_GIT_URL}" refs/heads/"${MATCH_GIT_BRANCH}" || true
+
+          echo "== Xcode version =="
+          xcodebuild -version || true
+
+        env:
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_GIT_BRANCH: ${{ secrets.MATCH_GIT_BRANCH }}
+          MATCH_TYPE: ${{ env.MATCH_TYPE }}
+
       - name: Build iOS (flavor from branch)
         run: |
           cd ios
@@ -581,6 +620,45 @@ jobs:
           MATCH_GIT_BRANCH: ${{ secrets.MATCH_GIT_BRANCH }}
           MATCH_TYPE: appstore
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+
+      - name: Phase 4a - Signing sanity checks (debug)
+        if: always()
+        run: |
+          echo "== Signing debug: env = =="
+          echo "MATCH_TYPE=${MATCH_TYPE}"
+          echo "MATCH_GIT_URL=${MATCH_GIT_URL}"
+          echo "MATCH_GIT_BRANCH=${MATCH_GIT_BRANCH}"
+          echo "GIT_SSH_COMMAND=${GIT_SSH_COMMAND}"
+
+          echo "== Ensure build.keychain is in search list =="
+          security list-keychains -d user -s build.keychain login.keychain || true
+
+          echo "== Unlock keychain =="
+          security unlock-keychain -p "" build.keychain || true
+
+          echo "== (Optional) set key partition list (may require password) =="
+          security set-key-partition-list -S apple-tool:,apple: -s -k "" ~/Library/Keychains/build.keychain-db || echo "set-key-partition-list failed (ok if keys already accessible)"
+
+          echo "== List keychains =="
+          security list-keychains -d user
+
+          echo "== Show signing identities (build.keychain) =="
+          security find-identity -v -p codesigning ~/Library/Keychains/build.keychain-db || security find-identity -v -p codesigning
+
+          echo "== List provisioning profiles =="
+          ls -la ~/Library/MobileDevice/Provisioning\ Profiles || true
+
+          echo "== Verify SSH/Git access to match repo =="
+          GIT_SSH_COMMAND="ssh -i ~/.ssh/match_deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no" \
+            git ls-remote "${MATCH_GIT_URL}" refs/heads/"${MATCH_GIT_BRANCH}" || true
+
+          echo "== Xcode version =="
+          xcodebuild -version || true
+
+        env:
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_GIT_BRANCH: ${{ secrets.MATCH_GIT_BRANCH }}
+          MATCH_TYPE: appstore
 
       - name: Build iOS (prod)
         run: |

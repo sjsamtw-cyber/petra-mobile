@@ -5,4 +5,14 @@ storage_mode("git")
 
 type(ENV["MATCH_TYPE"] || "adhoc")
 
-app_identifier(["com.petrasoftsolutions.mobile.qa", "com.petrasoftsolutions.mobile.staging", "com.petrasoftsolutions.mobile.prod"])
+# Select app identifiers based on the requested MATCH_TYPE.
+# - For App Store uploads (MATCH_TYPE == 'appstore') we only need the prod identifier.
+# - For non-prod (adhoc) we fetch QA and Staging adhoc profiles.
+# If you need `dev` adhoc profiles as well, add them to the adhoc_identifiers array below.
+if ENV["MATCH_TYPE"] == 'appstore'
+	app_identifier(["com.petrasoftsolutions.mobile.prod"])
+else
+	adhoc_identifiers = ["com.petrasoftsolutions.mobile.qa", "com.petrasoftsolutions.mobile.staging"]
+	# adhoc_identifiers << "com.petrasoftsolutions.mobile.dev" if ENV["INCLUDE_DEV_ADHOC"] == '1'
+	app_identifier(adhoc_identifiers)
+end

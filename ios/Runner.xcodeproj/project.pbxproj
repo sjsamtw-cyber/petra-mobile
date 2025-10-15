@@ -607,9 +607,13 @@
 			baseConfigurationReference = 6F0619F2746EBBF5F8731BCF /* stagingRelease.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = 9AV8848UR6;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.petrasoftsolutions.mobile.staging;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "match AdHoc com.petrasoftsolutions.mobile.staging";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -737,7 +741,11 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = F7CF2615AF6536CA37929D93 /* Pods-RunnerTests.release-qa.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
+				PRODUCT_BUNDLE_IDENTIFIER = com.petrasoftsolutions.mobile.qa;
 				PRODUCT_NAME = RunnerTests;
+				PROVISIONING_PROFILE_SPECIFIER = "match AdHoc com.petrasoftsolutions.mobile.qa";
 			};
 			name = "Release-qa";
 		};
@@ -761,7 +769,11 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D7526A8B6D4C66F577BA0972 /* Pods-RunnerTests.release-staging.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
+				PRODUCT_BUNDLE_IDENTIFIER = com.petrasoftsolutions.mobile.staging;
 				PRODUCT_NAME = RunnerTests;
+				PROVISIONING_PROFILE_SPECIFIER = "match AdHoc com.petrasoftsolutions.mobile.staging";
 			};
 			name = "Release-staging";
 		};
@@ -785,7 +797,11 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = C31FA4B82ABBEAFC72B621F7 /* Pods-RunnerTests.release-prod.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
+				PRODUCT_BUNDLE_IDENTIFIER = com.petrasoftsolutions.mobile.prod;
 				PRODUCT_NAME = RunnerTests;
+				PROVISIONING_PROFILE_SPECIFIER = "match AppStore com.petrasoftsolutions.mobile.prod";
 			};
 			name = "Release-prod";
 		};
@@ -989,9 +1005,13 @@
 			baseConfigurationReference = FDF5FBAA163F8C22C53E797E /* prodRelease.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = 9AV8848UR6;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.petrasoftsolutions.mobile.prod;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "match AppStore com.petrasoftsolutions.mobile.prod";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -1643,9 +1663,13 @@
 			baseConfigurationReference = 16C51AE0C0EA3D2B01ED2793 /* qaRelease.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = 9AV8848UR6;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.petrasoftsolutions.mobile.qa;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "match AdHoc com.petrasoftsolutions.mobile.qa";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
