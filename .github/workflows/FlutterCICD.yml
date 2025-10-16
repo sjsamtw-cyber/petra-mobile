@@ -57,6 +57,23 @@ jobs:
           ls -la /opt/homebrew/lib/ruby || true
           ls -la /opt/homebrew/opt/ruby* || true
 
+      - name: "Sanitize Ruby env (remove Homebrew ruby paths)"
+        run: |
+          echo "== Sanitizing Ruby environment: removing Homebrew Ruby entries =="
+          # Remove Homebrew Ruby-specific entries from PATH while preserving order
+          NEW_PATH=$(echo "$PATH" | tr ':' '\n' | grep -vE '/opt/homebrew/opt/ruby(@[0-9.]+)?/bin|/opt/homebrew/lib/ruby' | paste -sd: -)
+          echo "PATH=$NEW_PATH" >> $GITHUB_ENV
+          # Clear GEM and RUBY env vars that can point to Homebrew locations
+          echo "GEM_HOME=" >> $GITHUB_ENV
+          echo "GEM_PATH=" >> $GITHUB_ENV
+          echo "RUBYLIB=" >> $GITHUB_ENV
+          echo "RUBYOPT=" >> $GITHUB_ENV
+          echo "Sanitized PATH: $NEW_PATH"
+          echo "Ruby load path after sanitize (current process):"
+          ruby -e 'puts $LOAD_PATH' || true
+          echo "gem env after sanitize (current process):"
+          gem env || true
+
       - name: Cache ios/vendor/bundle
         uses: actions/cache@v4
         with:
@@ -276,6 +293,19 @@ jobs:
           echo "== List Homebrew ruby dirs (if present) =="
           ls -la /opt/homebrew/lib/ruby || true
           ls -la /opt/homebrew/opt/ruby* || true
+
+      - name: "Sanitize Ruby env (remove Homebrew ruby paths)"
+        run: |
+          echo "== Sanitizing Ruby environment: removing Homebrew Ruby entries =="
+          NEW_PATH=$(echo "$PATH" | tr ':' '\n' | grep -vE '/opt/homebrew/opt/ruby(@[0-9.]+)?/bin|/opt/homebrew/lib/ruby' | paste -sd: -)
+          echo "PATH=$NEW_PATH" >> $GITHUB_ENV
+          echo "GEM_HOME=" >> $GITHUB_ENV
+          echo "GEM_PATH=" >> $GITHUB_ENV
+          echo "RUBYLIB=" >> $GITHUB_ENV
+          echo "RUBYOPT=" >> $GITHUB_ENV
+          echo "Sanitized PATH: $NEW_PATH"
+          ruby -e 'puts $LOAD_PATH' || true
+          gem env || true
 
       - name: Cache ios/vendor/bundle
         uses: actions/cache@v4
@@ -604,6 +634,19 @@ jobs:
           echo "== List Homebrew ruby dirs (if present) =="
           ls -la /opt/homebrew/lib/ruby || true
           ls -la /opt/homebrew/opt/ruby* || true
+
+      - name: "Sanitize Ruby env (remove Homebrew ruby paths)"
+        run: |
+          echo "== Sanitizing Ruby environment: removing Homebrew Ruby entries =="
+          NEW_PATH=$(echo "$PATH" | tr ':' '\n' | grep -vE '/opt/homebrew/opt/ruby(@[0-9.]+)?/bin|/opt/homebrew/lib/ruby' | paste -sd: -)
+          echo "PATH=$NEW_PATH" >> $GITHUB_ENV
+          echo "GEM_HOME=" >> $GITHUB_ENV
+          echo "GEM_PATH=" >> $GITHUB_ENV
+          echo "RUBYLIB=" >> $GITHUB_ENV
+          echo "RUBYOPT=" >> $GITHUB_ENV
+          echo "Sanitized PATH: $NEW_PATH"
+          ruby -e 'puts $LOAD_PATH' || true
+          gem env || true
 
       - name: Cache ios/vendor/bundle
         uses: actions/cache@v4
