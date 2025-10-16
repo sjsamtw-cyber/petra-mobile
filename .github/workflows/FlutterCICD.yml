@@ -204,7 +204,17 @@ jobs:
           echo "Ruby & Bundler info:"
           which ruby || true
           which bundle || true
-          bundle exec pod install --repo-update
+          # Use the hosted toolcache Ruby binary explicitly to avoid Homebrew site_ruby being loaded
+          HOSTED_RUBY_BIN=$(which ruby)
+          echo "Using hosted ruby: $HOSTED_RUBY_BIN"
+          # Ensure gems are loaded from the repository vendor/bundle
+          export GEM_HOME="$PWD/vendor/bundle"
+          export GEM_PATH="$GEM_HOME"
+          # Clear RUBYOPT/RUBYLIB to avoid pulling in Homebrew site_ruby paths
+          unset RUBYOPT
+          unset RUBYLIB
+          # Run pod install under the hosted Ruby and the local bundle
+          "$HOSTED_RUBY_BIN" -S bundle exec pod install --repo-update || exit $?
 
           echo "== Pod install exit: $? "
 
@@ -491,7 +501,14 @@ jobs:
 
       - name: Install iOS Pods (build job)
         working-directory: ios
-        run: bundle exec pod install --repo-update
+        run: |
+          HOSTED_RUBY_BIN=$(which ruby)
+          echo "Using hosted ruby: $HOSTED_RUBY_BIN"
+          export GEM_HOME="$PWD/vendor/bundle"
+          export GEM_PATH="$GEM_HOME"
+          unset RUBYOPT
+          unset RUBYLIB
+          "$HOSTED_RUBY_BIN" -S bundle exec pod install --repo-update
 
       - name: Run Fastlane Match (iOS)
         working-directory: ios
@@ -798,7 +815,14 @@ jobs:
 
       - name: Install iOS Pods (build job)
         working-directory: ios
-        run: bundle exec pod install --repo-update
+        run: |
+          HOSTED_RUBY_BIN=$(which ruby)
+          echo "Using hosted ruby: $HOSTED_RUBY_BIN"
+          export GEM_HOME="$PWD/vendor/bundle"
+          export GEM_PATH="$GEM_HOME"
+          unset RUBYOPT
+          unset RUBYLIB
+          "$HOSTED_RUBY_BIN" -S bundle exec pod install --repo-update
 
       - name: Run Fastlane Match (iOS - appstore)
         working-directory: ios
