@@ -242,8 +242,8 @@ jobs:
           fi
           # Remove any pod binstub that might be shebanged to Homebrew Ruby
           rm -f ios/vendor/bundle/ruby/*/bin/pod || true
-          # Run pod install under the hosted Ruby and the local bundle
-          "$HOSTED_RUBY_BIN" -S bundle exec pod install --repo-update || exit $?
+          # Run pod install under the hosted Ruby with $LOAD_PATH sanitization
+          "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- bundle exec pod install --repo-update || exit $?
 
           echo "== Pod install exit: $? "
 
@@ -563,7 +563,7 @@ jobs:
           fi
           # Remove any pod binstub that might be shebanged to Homebrew Ruby
           rm -f ios/vendor/bundle/ruby/*/bin/pod || true
-          "$HOSTED_RUBY_BIN" -S bundle exec pod install --repo-update
+          "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- bundle exec pod install --repo-update
 
       - name: Run Fastlane Match (iOS)
         working-directory: ios
@@ -895,7 +895,7 @@ jobs:
           fi
           # Remove any pod binstub that might be shebanged to Homebrew Ruby
           rm -f ios/vendor/bundle/ruby/*/bin/pod || true
-          "$HOSTED_RUBY_BIN" -S bundle exec pod install --repo-update
+          "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- bundle exec pod install --repo-update
 
       - name: Run Fastlane Match (iOS - appstore)
         working-directory: ios
