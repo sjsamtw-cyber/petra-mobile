@@ -264,13 +264,17 @@ jobs:
         run: |
           # Remove any pod binstub that might be shebanged to Homebrew Ruby
           rm -f ios/vendor/bundle/ruby/*/bin/pod || true
-          # CI safeguard: Ensure a CocoaPods executable compatible with Podfile.lock is available
-          echo "== CI: ensuring compatible CocoaPods is installed into vendor/bundle =="
-          GEM_HOME="$PWD/vendor/bundle" GEM_PATH="$PWD/vendor/bundle" \
-            "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- gem install cocoapods -v "1.16.2" --no-document || true
+          # Ensure gems from ios/Gemfile (and ios/Gemfile.lock) are installed into vendor/bundle
+          echo "== CI: installing gems into ios/vendor/bundle (bundle install) =="
+          export GEM_HOME="$PWD/vendor/bundle"
+          export GEM_PATH="$GEM_HOME"
+          unset RUBYOPT
+          unset RUBYLIB
+          # Install Bundler-managed gems into the repository vendor/bundle (fail the job on error)
+          "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- bundle install --jobs=4 --retry=3
 
-          # Bypass pod binstub entirely by using bundle exec ruby with require to avoid shebang execution
-          "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- bundle exec ruby -e 'require "bundler/setup"; require "cocoapods"; Pod::Command.run(["install", "--repo-update"])' || exit $?
+          # Run CocoaPods via the Ruby API under bundle exec (bypass pod binstub shebangs)
+          "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- bundle exec ruby -e 'require "bundler/setup"; require "cocoapods"; Pod::Command.run(["install","--repo-update"])' || exit $?
 
           echo "== Pod install exit: $? "
 
