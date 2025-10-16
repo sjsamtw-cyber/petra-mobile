@@ -210,7 +210,7 @@ jobs:
           retention-days: 30
 
       # ===== Phase 3 — Install Platform Dependencies & Validate iOS Pod Integration =====
-      - name: Phase 3 - Install iOS Pods & validate
+      - name: Phase 3 - iOS pod diagnostics (pre-install)
         working-directory: ios
         run: |
           echo "== Phase 3: pod install (repo update) =="
@@ -240,13 +240,31 @@ jobs:
           else
             echo "pod not on PATH; showing possible vendor binstub:"; head -n 1 ios/vendor/bundle/ruby/*/bin/pod 2>/dev/null || true
           fi
+
+      - name: Phase 3 - Start interactive debug session (tmate)
+        if: github.ref == 'refs/heads/mobile-qa'
+        uses: mxschmitt/action-tmate@v3
+        id: tmate
+        with:
+          # Start tmate in detached mode so the workflow continues and we can keep a separate
+          # sleep window to allow connection. The action prints SSH and web connection info.
+          detached: true
+          # Restrict access to the actor's registered public SSH keys (safer than allowing anyone)
+          limit-access-to-actor: true
+
+      - name: Phase 3 - Keep debug window open briefly
+        if: github.ref == 'refs/heads/mobile-qa'
+        run: |
+          echo "Debug window open for 1 hour (3600s). Connect via tmate now and run diagnostics."
+          # give operator time to connect and inspect the runner
+          sleep 3600
+
+      - name: Phase 3 - Install iOS Pods & validate
+        working-directory: ios
+        run: |
           # Remove any pod binstub that might be shebanged to Homebrew Ruby
           rm -f ios/vendor/bundle/ruby/*/bin/pod || true
           # CI safeguard: Ensure a CocoaPods executable compatible with Podfile.lock is available
-          # Some Podfile.lock files are generated with newer CocoaPods (eg. 1.16.x). If the
-          # bundled/executable CocoaPods is older (eg. 1.10.x) the install will fail (FirebaseAnalytics
-          # requires >= 1.12.0). Install the matching CocoaPods gem into the ios/vendor/bundle under
-          # the hosted Ruby so the subsequent require 'cocoapods' will succeed.
           echo "== CI: ensuring compatible CocoaPods is installed into vendor/bundle =="
           GEM_HOME="$PWD/vendor/bundle" GEM_PATH="$PWD/vendor/bundle" \
             "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- gem install cocoapods -v "1.16.2" --no-document || true
