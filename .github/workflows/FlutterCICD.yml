@@ -227,6 +227,8 @@ jobs:
           else
             echo "pod not on PATH; showing possible vendor binstub:"; head -n 1 ios/vendor/bundle/ruby/*/bin/pod 2>/dev/null || true
           fi
+          # Remove any pod binstub that might be shebanged to Homebrew Ruby
+          rm -f ios/vendor/bundle/ruby/*/bin/pod || true
           # Run pod install under the hosted Ruby and the local bundle
           "$HOSTED_RUBY_BIN" -S bundle exec pod install --repo-update || exit $?
 
@@ -534,6 +536,8 @@ jobs:
           else
             echo "pod not on PATH; showing possible vendor binstub:"; head -n 1 ios/vendor/bundle/ruby/*/bin/pod 2>/dev/null || true
           fi
+          # Remove any pod binstub that might be shebanged to Homebrew Ruby
+          rm -f ios/vendor/bundle/ruby/*/bin/pod || true
           "$HOSTED_RUBY_BIN" -S bundle exec pod install --repo-update
 
       - name: Run Fastlane Match (iOS)
@@ -860,6 +864,8 @@ jobs:
           else
             echo "pod not on PATH; showing possible vendor binstub:"; head -n 1 ios/vendor/bundle/ruby/*/bin/pod 2>/dev/null || true
           fi
+          # Remove any pod binstub that might be shebanged to Homebrew Ruby
+          rm -f ios/vendor/bundle/ruby/*/bin/pod || true
           "$HOSTED_RUBY_BIN" -S bundle exec pod install --repo-update
 
       - name: Run Fastlane Match (iOS - appstore)
