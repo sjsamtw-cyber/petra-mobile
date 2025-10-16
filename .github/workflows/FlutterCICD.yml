@@ -41,6 +41,22 @@ jobs:
       - name: Install Bundler
         run: gem install bundler -v 2.6.9 --no-document
 
+      - name: "Debug: PATH & Ruby env after installing Bundler"
+        run: |
+          echo "== PATH =="
+          echo "$PATH"
+          echo "== which executables =="
+          which ruby || true
+          which gem || true
+          which bundle || true
+          echo "== gem env =="
+          gem env || true
+          echo "== env vars affecting Ruby/Bundler =="
+          env | grep -i "GEM\|RUBY\|BUNDLE" || true
+          echo "== List Homebrew ruby dirs (if present) =="
+          ls -la /opt/homebrew/lib/ruby || true
+          ls -la /opt/homebrew/opt/ruby* || true
+
       - name: Cache ios/vendor/bundle
         uses: actions/cache@v4
         with:
@@ -244,6 +260,22 @@ jobs:
 
       - name: Install Bundler
         run: gem install bundler -v 2.6.9 --no-document
+
+      - name: "Debug: PATH & Ruby env after installing Bundler"
+        run: |
+          echo "== PATH =="
+          echo "$PATH"
+          echo "== which executables =="
+          which ruby || true
+          which gem || true
+          which bundle || true
+          echo "== gem env =="
+          gem env || true
+          echo "== env vars affecting Ruby/Bundler =="
+          env | grep -i "GEM\|RUBY\|BUNDLE" || true
+          echo "== List Homebrew ruby dirs (if present) =="
+          ls -la /opt/homebrew/lib/ruby || true
+          ls -la /opt/homebrew/opt/ruby* || true
 
       - name: Cache ios/vendor/bundle
         uses: actions/cache@v4
@@ -556,6 +588,22 @@ jobs:
 
       - name: Install Bundler
         run: gem install bundler -v 2.6.9 --no-document
+
+      - name: "Debug: PATH & Ruby env after installing Bundler"
+        run: |
+          echo "== PATH =="
+          echo "$PATH"
+          echo "== which executables =="
+          which ruby || true
+          which gem || true
+          which bundle || true
+          echo "== gem env =="
+          gem env || true
+          echo "== env vars affecting Ruby/Bundler =="
+          env | grep -i "GEM\|RUBY\|BUNDLE" || true
+          echo "== List Homebrew ruby dirs (if present) =="
+          ls -la /opt/homebrew/lib/ruby || true
+          ls -la /opt/homebrew/opt/ruby* || true
 
       - name: Cache ios/vendor/bundle
         uses: actions/cache@v4
