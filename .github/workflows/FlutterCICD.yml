@@ -41,14 +41,6 @@ jobs:
       - name: Install Bundler
         run: gem install bundler -v 2.6.9 --no-document
 
-      - name: Install iOS dependencies
-        working-directory: ios
-        run: |
-          bundle config set --local deployment 'true'
-          bundle config set --local without 'development test'
-          bundle config set --local path 'vendor/bundle'
-          bundle install --jobs=4 --retry=3
-
       - name: Cache ios/vendor/bundle
         uses: actions/cache@v4
         with:
@@ -57,8 +49,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-ruby-3.3-bundler-2.6.9-ios-
 
-      - name: Install Android dependencies
-        working-directory: android
+      - name: Install iOS dependencies
+        working-directory: ios
         run: |
           bundle config set --local deployment 'true'
           bundle config set --local without 'development test'
@@ -72,6 +64,14 @@ jobs:
           key: ${{ runner.os }}-ruby-3.3-bundler-2.6.9-android-${{ hashFiles('android/Gemfile.lock') }}
           restore-keys: |
             ${{ runner.os }}-ruby-3.3-bundler-2.6.9-android-
+
+      - name: Install Android dependencies
+        working-directory: android
+        run: |
+          bundle config set --local deployment 'true'
+          bundle config set --local without 'development test'
+          bundle config set --local path 'vendor/bundle'
+          bundle install --jobs=4 --retry=3
 
       # ===== Java/JDK Setup (for Android builds) =====
       - name: Set up JDK
@@ -233,14 +233,6 @@ jobs:
       - name: Install Bundler
         run: gem install bundler -v 2.6.9 --no-document
 
-      - name: Install iOS dependencies
-        working-directory: ios
-        run: |
-          bundle config set --local deployment 'true'
-          bundle config set --local without 'development test'
-          bundle config set --local path 'vendor/bundle'
-          bundle install --jobs=4 --retry=3
-
       - name: Cache ios/vendor/bundle
         uses: actions/cache@v4
         with:
@@ -249,8 +241,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-ruby-3.3-bundler-2.6.9-ios-
 
-      - name: Install Android dependencies
-        working-directory: android
+      - name: Install iOS dependencies
+        working-directory: ios
         run: |
           bundle config set --local deployment 'true'
           bundle config set --local without 'development test'
@@ -264,6 +256,14 @@ jobs:
           key: ${{ runner.os }}-ruby-3.3-bundler-2.6.9-android-${{ hashFiles('android/Gemfile.lock') }}
           restore-keys: |
             ${{ runner.os }}-ruby-3.3-bundler-2.6.9-android-
+
+      - name: Install Android dependencies
+        working-directory: android
+        run: |
+          bundle config set --local deployment 'true'
+          bundle config set --local without 'development test'
+          bundle config set --local path 'vendor/bundle'
+          bundle install --jobs=4 --retry=3
 
       - name: Download test artifacts
         uses: actions/download-artifact@v4
@@ -532,6 +532,14 @@ jobs:
       - name: Install Bundler
         run: gem install bundler -v 2.6.9 --no-document
 
+      - name: Cache ios/vendor/bundle
+        uses: actions/cache@v4
+        with:
+          path: ios/vendor/bundle
+          key: ${{ runner.os }}-ruby-3.3-bundler-2.6.9-ios-${{ hashFiles('ios/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-ruby-3.3-bundler-2.6.9-ios-
+
       - name: Install iOS dependencies
         working-directory: ios
         run: |
@@ -539,6 +547,14 @@ jobs:
           bundle config set --local without 'development test'
           bundle config set --local path 'vendor/bundle'
           bundle install --jobs=4 --retry=3
+
+      - name: Cache android/vendor/bundle
+        uses: actions/cache@v4
+        with:
+          path: android/vendor/bundle
+          key: ${{ runner.os }}-ruby-3.3-bundler-2.6.9-android-${{ hashFiles('android/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-ruby-3.3-bundler-2.6.9-android-
 
       - name: Install Android dependencies
         working-directory: android
