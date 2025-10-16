@@ -213,6 +213,20 @@ jobs:
           # Clear RUBYOPT/RUBYLIB to avoid pulling in Homebrew site_ruby paths
           unset RUBYOPT
           unset RUBYLIB
+          # Diagnostic: show runtime and gem paths right before pod install
+          echo "== Diagnostic: ruby & gem info before pod install =="
+          echo "which ruby: $(which ruby)"
+          ruby -v || true
+          echo "HOSTED_RUBY_BIN=$HOSTED_RUBY_BIN"
+          ruby -e 'require "rubygems"; puts "Gem.path:"; puts Gem.path' || true
+          echo "GEM_HOME=$GEM_HOME GEM_PATH=$GEM_PATH RUBYLIB=$RUBYLIB RUBYOPT=$RUBYOPT"
+          "$HOSTED_RUBY_BIN" -S bundle env | sed -n '1,120p' || true
+          # Show pod/bin shebang (if present)
+          if command -v pod >/dev/null 2>&1; then
+            echo "pod binstub shebang:"; head -n 1 "$(command -v pod)" || true
+          else
+            echo "pod not on PATH; showing possible vendor binstub:"; head -n 1 ios/vendor/bundle/ruby/*/bin/pod 2>/dev/null || true
+          fi
           # Run pod install under the hosted Ruby and the local bundle
           "$HOSTED_RUBY_BIN" -S bundle exec pod install --repo-update || exit $?
 
@@ -508,6 +522,18 @@ jobs:
           export GEM_PATH="$GEM_HOME"
           unset RUBYOPT
           unset RUBYLIB
+          echo "== Diagnostic: ruby & gem info before pod install (build job) =="
+          echo "which ruby: $(which ruby)"
+          ruby -v || true
+          echo "HOSTED_RUBY_BIN=$HOSTED_RUBY_BIN"
+          ruby -e 'require "rubygems"; puts "Gem.path:"; puts Gem.path' || true
+          echo "GEM_HOME=$GEM_HOME GEM_PATH=$GEM_PATH RUBYLIB=$RUBYLIB RUBYOPT=$RUBYOPT"
+          "$HOSTED_RUBY_BIN" -S bundle env | sed -n '1,120p' || true
+          if command -v pod >/dev/null 2>&1; then
+            echo "pod binstub shebang:"; head -n 1 "$(command -v pod)" || true
+          else
+            echo "pod not on PATH; showing possible vendor binstub:"; head -n 1 ios/vendor/bundle/ruby/*/bin/pod 2>/dev/null || true
+          fi
           "$HOSTED_RUBY_BIN" -S bundle exec pod install --repo-update
 
       - name: Run Fastlane Match (iOS)
@@ -822,6 +848,18 @@ jobs:
           export GEM_PATH="$GEM_HOME"
           unset RUBYOPT
           unset RUBYLIB
+          echo "== Diagnostic: ruby & gem info before pod install (prod build job) =="
+          echo "which ruby: $(which ruby)"
+          ruby -v || true
+          echo "HOSTED_RUBY_BIN=$HOSTED_RUBY_BIN"
+          ruby -e 'require "rubygems"; puts "Gem.path:"; puts Gem.path' || true
+          echo "GEM_HOME=$GEM_HOME GEM_PATH=$GEM_PATH RUBYLIB=$RUBYLIB RUBYOPT=$RUBYOPT"
+          "$HOSTED_RUBY_BIN" -S bundle env | sed -n '1,120p' || true
+          if command -v pod >/dev/null 2>&1; then
+            echo "pod binstub shebang:"; head -n 1 "$(command -v pod)" || true
+          else
+            echo "pod not on PATH; showing possible vendor binstub:"; head -n 1 ios/vendor/bundle/ruby/*/bin/pod 2>/dev/null || true
+          fi
           "$HOSTED_RUBY_BIN" -S bundle exec pod install --repo-update
 
       - name: Run Fastlane Match (iOS - appstore)
