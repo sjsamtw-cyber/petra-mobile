@@ -79,17 +79,7 @@ jobs:
             export GEM_HOME="$(pwd)/vendor/bundle/ruby/$($RUBY_BIN -e 'print RUBY_VERSION')"
             export GEM_PATH="$GEM_HOME"
             # Run bundler directly through Ruby to avoid binstub/version mismatches
-            $RUBY_BIN - <<'RUBY'
-            ENV['BUNDLE_GEMFILE'] = File.expand_path('Gemfile', Dir.pwd)
-            ENV['BUNDLE_PATH'] = File.expand_path('vendor/bundle', Dir.pwd)
-            ENV['GEM_HOME'] = File.expand_path("vendor/bundle/ruby/#{RUBY_VERSION}", Dir.pwd)
-            ENV['GEM_PATH'] = ENV['GEM_HOME']
-            require 'bundler'
-            Bundler.settings.set_local('deployment','true')
-            Bundler.settings.set_local('without','development test')
-            Bundler.settings.set_local('path','vendor/bundle')
-            Bundler::CLI.start(['install','--jobs=4','--retry=3','--path','vendor/bundle','--deployment','--quiet'])
-            RUBY
+            $RUBY_BIN -e "ENV['BUNDLE_GEMFILE']=File.expand_path('Gemfile',Dir.pwd); ENV['BUNDLE_PATH']=File.expand_path('vendor/bundle',Dir.pwd); ENV['GEM_HOME']=File.expand_path(\"vendor/bundle/ruby/#{RUBY_VERSION}\",Dir.pwd); ENV['GEM_PATH']=ENV['GEM_HOME']; require 'bundler/cli'; Bundler.settings.set_local('deployment','true'); Bundler.settings.set_local('without','development test'); Bundler.settings.set_local('path','vendor/bundle'); Bundler::CLI.start(%w[install --jobs=4 --retry=3 --path vendor/bundle --deployment --quiet])"
           else
             echo "No Gemfile in ios, skipping bundle install"
           fi
@@ -117,17 +107,7 @@ jobs:
             export GEM_HOME="$(pwd)/vendor/bundle/ruby/$($RUBY_BIN -e 'print RUBY_VERSION')"
             export GEM_PATH="$GEM_HOME"
             # Run bundler directly through Ruby to avoid binstub/version mismatches
-            $RUBY_BIN - <<'RUBY'
-            ENV['BUNDLE_GEMFILE'] = File.expand_path('Gemfile', Dir.pwd)
-            ENV['BUNDLE_PATH'] = File.expand_path('vendor/bundle', Dir.pwd)
-            ENV['GEM_HOME'] = File.expand_path("vendor/bundle/ruby/#{RUBY_VERSION}", Dir.pwd)
-            ENV['GEM_PATH'] = ENV['GEM_HOME']
-            require 'bundler'
-            Bundler.settings.set_local('deployment','true')
-            Bundler.settings.set_local('without','development test')
-            Bundler.settings.set_local('path','vendor/bundle')
-            Bundler::CLI.start(['install','--jobs=4','--retry=3','--path','vendor/bundle','--deployment','--quiet'])
-            RUBY
+            $RUBY_BIN -e "ENV['BUNDLE_GEMFILE']=File.expand_path('Gemfile',Dir.pwd); ENV['BUNDLE_PATH']=File.expand_path('vendor/bundle',Dir.pwd); ENV['GEM_HOME']=File.expand_path(\"vendor/bundle/ruby/#{RUBY_VERSION}\",Dir.pwd); ENV['GEM_PATH']=ENV['GEM_HOME']; require 'bundler/cli'; Bundler.settings.set_local('deployment','true'); Bundler.settings.set_local('without','development test'); Bundler.settings.set_local('path','vendor/bundle'); Bundler::CLI.start(%w[install --jobs=4 --retry=3 --path vendor/bundle --deployment --quiet])"
           else
             echo "No Gemfile in android, skipping bundle install"
           fi
@@ -231,13 +211,7 @@ jobs:
             export GEM_PATH="$GEM_HOME"
             echo "Using Bundler (via selected Ruby): $RUBY_BIN -S bundle --version"
             echo "Ruby: $RUBY_BIN --version"
-            $RUBY_BIN - <<'RUBY'
-            ENV['BUNDLE_GEMFILE'] ||= File.expand_path('Gemfile', Dir.pwd)
-            ENV['GEM_HOME'] ||= File.expand_path("vendor/bundle/ruby/#{RUBY_VERSION}", Dir.pwd)
-            ENV['GEM_PATH'] ||= ENV['GEM_HOME']
-            require 'bundler/cli'
-            Bundler::CLI.start(['exec','pod','install','--repo-update'])
-            RUBY
+            $RUBY_BIN -e "ENV['BUNDLE_GEMFILE']=File.expand_path('Gemfile',Dir.pwd); ENV['GEM_HOME']=File.expand_path(\"vendor/bundle/ruby/#{RUBY_VERSION}\",Dir.pwd); ENV['GEM_PATH']=ENV['GEM_HOME']; require 'bundler/cli'; Bundler::CLI.start(%w[exec pod install --repo-update])"
           else
             pod install --repo-update
           fi
