@@ -56,6 +56,18 @@ jobs:
           bundle config set --local without 'development test'
           bundle config set --local path 'vendor/bundle'
           bundle install --jobs=4 --retry=3
+      - name: "Debug: show Ruby/Bundler and ios/vendor/bundle"
+        run: |
+          echo "== Ruby & Bundler info =="
+          which ruby || true
+          ruby --version || true
+          which gem || true
+          gem env || true
+          bundle --version || true
+          echo "== ios/vendor/bundle contents =="
+          ls -la ios/vendor/bundle || echo "ios/vendor/bundle does not exist or is empty"
+          echo "== native extension files (if any) =="
+          find ios/vendor/bundle -type f \( -name '*.so' -o -name '*.bundle' \) -print || true
 
       - name: Cache android/vendor/bundle
         uses: actions/cache@v4
@@ -248,6 +260,19 @@ jobs:
           bundle config set --local without 'development test'
           bundle config set --local path 'vendor/bundle'
           bundle install --jobs=4 --retry=3
+
+      - name: "Debug: show Ruby/Bundler and ios/vendor/bundle"
+        run: |
+          echo "== Ruby & Bundler info =="
+          which ruby || true
+          ruby --version || true
+          which gem || true
+          gem env || true
+          bundle --version || true
+          echo "== ios/vendor/bundle contents =="
+          ls -la ios/vendor/bundle || echo "ios/vendor/bundle does not exist or is empty"
+          echo "== native extension files (if any) =="
+          find ios/vendor/bundle -type f \( -name '*.so' -o -name '*.bundle' \) -print || true
 
       - name: Cache android/vendor/bundle
         uses: actions/cache@v4
