@@ -242,6 +242,15 @@ jobs:
           fi
           # Remove any pod binstub that might be shebanged to Homebrew Ruby
           rm -f ios/vendor/bundle/ruby/*/bin/pod || true
+          # CI safeguard: Ensure a CocoaPods executable compatible with Podfile.lock is available
+          # Some Podfile.lock files are generated with newer CocoaPods (eg. 1.16.x). If the
+          # bundled/executable CocoaPods is older (eg. 1.10.x) the install will fail (FirebaseAnalytics
+          # requires >= 1.12.0). Install the matching CocoaPods gem into the ios/vendor/bundle under
+          # the hosted Ruby so the subsequent require 'cocoapods' will succeed.
+          echo "== CI: ensuring compatible CocoaPods is installed into vendor/bundle =="
+          GEM_HOME="$PWD/vendor/bundle" GEM_PATH="$PWD/vendor/bundle" \
+            "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- gem install cocoapods -v "1.16.2" --no-document || true
+
           # Bypass pod binstub entirely by using bundle exec ruby with require to avoid shebang execution
           "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- bundle exec ruby -e 'require "bundler/setup"; require "cocoapods"; Pod::Command.run(["install", "--repo-update"])' || exit $?
 
