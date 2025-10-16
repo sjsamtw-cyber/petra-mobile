@@ -201,6 +201,9 @@ jobs:
         working-directory: ios
         run: |
           echo "== Phase 3: pod install (repo update) =="
+          echo "Ruby & Bundler info:"
+          which ruby || true
+          which bundle || true
           bundle exec pod install --repo-update
 
           echo "== Pod install exit: $? "
