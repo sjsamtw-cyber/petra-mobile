@@ -78,10 +78,18 @@ jobs:
             export BUNDLE_PATH="$(pwd)/vendor/bundle"
             export GEM_HOME="$(pwd)/vendor/bundle/ruby/$($RUBY_BIN -e 'print RUBY_VERSION')"
             export GEM_PATH="$GEM_HOME"
-            $RUBY_BIN -S bundle config set --local deployment 'true'
-            $RUBY_BIN -S bundle config set --local without 'development test'
-            $RUBY_BIN -S bundle config set --local path 'vendor/bundle'
-            $RUBY_BIN -S bundle install --jobs=4 --retry=3 --path vendor/bundle --deployment --quiet
+            # Run bundler directly through Ruby to avoid binstub/version mismatches
+            $RUBY_BIN - <<'RUBY'
+            ENV['BUNDLE_GEMFILE'] = File.expand_path('Gemfile', Dir.pwd)
+            ENV['BUNDLE_PATH'] = File.expand_path('vendor/bundle', Dir.pwd)
+            ENV['GEM_HOME'] = File.expand_path("vendor/bundle/ruby/#{RUBY_VERSION}", Dir.pwd)
+            ENV['GEM_PATH'] = ENV['GEM_HOME']
+            require 'bundler'
+            Bundler.settings.set_local('deployment','true')
+            Bundler.settings.set_local('without','development test')
+            Bundler.settings.set_local('path','vendor/bundle')
+            Bundler::CLI.start(['install','--jobs=4','--retry=3','--path','vendor/bundle','--deployment','--quiet'])
+            RUBY
           else
             echo "No Gemfile in ios, skipping bundle install"
           fi
@@ -108,10 +116,18 @@ jobs:
             export BUNDLE_PATH="$(pwd)/vendor/bundle"
             export GEM_HOME="$(pwd)/vendor/bundle/ruby/$($RUBY_BIN -e 'print RUBY_VERSION')"
             export GEM_PATH="$GEM_HOME"
-            $RUBY_BIN -S bundle config set --local deployment 'true'
-            $RUBY_BIN -S bundle config set --local without 'development test'
-            $RUBY_BIN -S bundle config set --local path 'vendor/bundle'
-            $RUBY_BIN -S bundle install --jobs=4 --retry=3 --path vendor/bundle --deployment --quiet
+            # Run bundler directly through Ruby to avoid binstub/version mismatches
+            $RUBY_BIN - <<'RUBY'
+            ENV['BUNDLE_GEMFILE'] = File.expand_path('Gemfile', Dir.pwd)
+            ENV['BUNDLE_PATH'] = File.expand_path('vendor/bundle', Dir.pwd)
+            ENV['GEM_HOME'] = File.expand_path("vendor/bundle/ruby/#{RUBY_VERSION}", Dir.pwd)
+            ENV['GEM_PATH'] = ENV['GEM_HOME']
+            require 'bundler'
+            Bundler.settings.set_local('deployment','true')
+            Bundler.settings.set_local('without','development test')
+            Bundler.settings.set_local('path','vendor/bundle')
+            Bundler::CLI.start(['install','--jobs=4','--retry=3','--path','vendor/bundle','--deployment','--quiet'])
+            RUBY
           else
             echo "No Gemfile in android, skipping bundle install"
           fi
@@ -215,7 +231,13 @@ jobs:
             export GEM_PATH="$GEM_HOME"
             echo "Using Bundler (via selected Ruby): $RUBY_BIN -S bundle --version"
             echo "Ruby: $RUBY_BIN --version"
-            $RUBY_BIN -S bundle exec pod install --repo-update
+            $RUBY_BIN - <<'RUBY'
+            ENV['BUNDLE_GEMFILE'] ||= File.expand_path('Gemfile', Dir.pwd)
+            ENV['GEM_HOME'] ||= File.expand_path("vendor/bundle/ruby/#{RUBY_VERSION}", Dir.pwd)
+            ENV['GEM_PATH'] ||= ENV['GEM_HOME']
+            require 'bundler/cli'
+            Bundler::CLI.start(['exec','pod','install','--repo-update'])
+            RUBY
           else
             pod install --repo-update
           fi
@@ -530,7 +552,13 @@ jobs:
         run: |
           cd ios
           echo "Fetching certificates via Match (type: $MATCH_TYPE)"
-          $RUBY_BIN -S bundle exec fastlane fetch_certificates
+          $RUBY_BIN - <<'RUBY'
+          ENV['BUNDLE_GEMFILE'] ||= File.expand_path('Gemfile', Dir.pwd)
+          ENV['GEM_HOME'] ||= File.expand_path("vendor/bundle/ruby/#{RUBY_VERSION}", Dir.pwd)
+          ENV['GEM_PATH'] ||= ENV['GEM_HOME']
+          require 'bundler/cli'
+          Bundler::CLI.start(['exec','fastlane','fetch_certificates'])
+          RUBY
         env:
           MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
           MATCH_GIT_BRANCH: ${{ secrets.MATCH_GIT_BRANCH }}
@@ -580,7 +608,13 @@ jobs:
         run: |
           cd ios
           echo "Building iOS flavor: $FLAVOR"
-          $RUBY_BIN -S bundle exec fastlane build flavor:$FLAVOR
+          $RUBY_BIN - <<'RUBY'
+          ENV['BUNDLE_GEMFILE'] ||= File.expand_path('Gemfile', Dir.pwd)
+          ENV['GEM_HOME'] ||= File.expand_path("vendor/bundle/ruby/#{RUBY_VERSION}", Dir.pwd)
+          ENV['GEM_PATH'] ||= ENV['GEM_HOME']
+          require 'bundler/cli'
+          Bundler::CLI.start(['exec','fastlane','build',"flavor:#{ENV['FLAVOR']}"])
+          RUBY
         env:
           BUILD_NAME: 1.0.0
           BUILD_NUMBER: ${{ github.run_number }}
@@ -594,7 +628,13 @@ jobs:
         run: |
           cd ios
           echo "Uploading iOS flavor: $FLAVOR to TestFlight (Internal)"
-          $RUBY_BIN -S bundle exec fastlane upload flavor:$FLAVOR
+          $RUBY_BIN - <<'RUBY'
+          ENV['BUNDLE_GEMFILE'] ||= File.expand_path('Gemfile', Dir.pwd)
+          ENV['GEM_HOME'] ||= File.expand_path("vendor/bundle/ruby/#{RUBY_VERSION}", Dir.pwd)
+          ENV['GEM_PATH'] ||= ENV['GEM_HOME']
+          require 'bundler/cli'
+          Bundler::CLI.start(['exec','fastlane','upload',"flavor:#{ENV['FLAVOR']}"])
+          RUBY
         env:
           MATCH_TYPE: ${{ env.MATCH_TYPE }}
           APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
