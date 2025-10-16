@@ -242,8 +242,8 @@ jobs:
           fi
           # Remove any pod binstub that might be shebanged to Homebrew Ruby
           rm -f ios/vendor/bundle/ruby/*/bin/pod || true
-          # Run pod install under the hosted Ruby with $LOAD_PATH sanitization
-          "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- bundle exec pod install --repo-update || exit $?
+          # Bypass pod binstub entirely by using bundle exec ruby with require to avoid shebang execution
+          "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- bundle exec ruby -e 'require "bundler/setup"; require "cocoapods"; Pod::Command.run(["install", "--repo-update"])' || exit $?
 
           echo "== Pod install exit: $? "
 
@@ -563,7 +563,7 @@ jobs:
           fi
           # Remove any pod binstub that might be shebanged to Homebrew Ruby
           rm -f ios/vendor/bundle/ruby/*/bin/pod || true
-          "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- bundle exec pod install --repo-update
+          "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- bundle exec ruby -e 'require "bundler/setup"; require "cocoapods"; Pod::Command.run(["install", "--repo-update"])'
 
       - name: Run Fastlane Match (iOS)
         working-directory: ios
@@ -895,7 +895,7 @@ jobs:
           fi
           # Remove any pod binstub that might be shebanged to Homebrew Ruby
           rm -f ios/vendor/bundle/ruby/*/bin/pod || true
-          "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- bundle exec pod install --repo-update
+          "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- bundle exec ruby -e 'require "bundler/setup"; require "cocoapods"; Pod::Command.run(["install", "--repo-update"])'
 
       - name: Run Fastlane Match (iOS - appstore)
         working-directory: ios
