@@ -46,3 +46,8 @@ app.*.map.json
 ios/vendor/
 android/vendor/
 
+# ignore Android local properties
+android/local.properties
+
+# ignore bundler config
+ios/.bundle/config
