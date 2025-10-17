@@ -41,22 +41,6 @@ jobs:
       - name: Install Bundler
         run: gem install bundler -v 2.6.9 --no-document
 
-      - name: "Debug: PATH & Ruby env after installing Bundler"
-        run: |
-          echo "== PATH =="
-          echo "$PATH"
-          echo "== which executables =="
-          which ruby || true
-          which gem || true
-          which bundle || true
-          echo "== gem env =="
-          gem env || true
-          echo "== env vars affecting Ruby/Bundler =="
-          env | grep -i "GEM\|RUBY\|BUNDLE" || true
-          echo "== List Homebrew ruby dirs (if present) =="
-          ls -la /opt/homebrew/lib/ruby || true
-          ls -la /opt/homebrew/opt/ruby* || true
-
       - name: "Sanitize Ruby env (remove Homebrew ruby paths)"
         run: |
           echo "== Sanitizing Ruby environment: removing Homebrew Ruby entries =="
@@ -68,11 +52,6 @@ jobs:
           echo "GEM_PATH=" >> $GITHUB_ENV
           echo "RUBYLIB=" >> $GITHUB_ENV
           echo "RUBYOPT=" >> $GITHUB_ENV
-          echo "Sanitized PATH: $NEW_PATH"
-          echo "Ruby load path after sanitize (current process):"
-          ruby -e 'puts $LOAD_PATH' || true
-          echo "gem env after sanitize (current process):"
-          gem env || true
 
       - name: Cache ios/vendor/bundle
         uses: actions/cache@v4
@@ -96,18 +75,6 @@ jobs:
           export GEM_PATH="$GEM_HOME"
           unset RUBYOPT RUBYLIB
           "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- bundle install --jobs=4 --retry=3
-      - name: "Debug: show Ruby/Bundler and ios/vendor/bundle"
-        run: |
-          echo "== Ruby & Bundler info =="
-          which ruby || true
-          ruby --version || true
-          which gem || true
-          gem env || true
-          bundle --version || true
-          echo "== ios/vendor/bundle contents =="
-          ls -la ios/vendor/bundle || echo "ios/vendor/bundle does not exist or is empty"
-          echo "== native extension files (if any) =="
-          find ios/vendor/bundle -type f \( -name '*.so' -o -name '*.bundle' \) -print || true
 
       - name: Cache android/vendor/bundle
         uses: actions/cache@v4
@@ -210,73 +177,41 @@ jobs:
           retention-days: 30
 
       # ===== Phase 3 — Install Platform Dependencies & Validate iOS Pod Integration =====
-      - name: Phase 3 - iOS pod diagnostics (pre-install)
-        working-directory: ios
-        run: |
-          echo "== Phase 3: pod install (repo update) =="
-          echo "Ruby & Bundler info:"
-          which ruby || true
-          which bundle || true
-          # Use the hosted toolcache Ruby binary explicitly to avoid Homebrew site_ruby being loaded
-          HOSTED_RUBY_BIN=$(which ruby)
-          echo "Using hosted ruby: $HOSTED_RUBY_BIN"
-          # Ensure gems are loaded from the repository vendor/bundle
-          export GEM_HOME="$PWD/vendor/bundle"
-          export GEM_PATH="$GEM_HOME"
-          # Clear RUBYOPT/RUBYLIB to avoid pulling in Homebrew site_ruby paths
-          unset RUBYOPT
-          unset RUBYLIB
-          # Diagnostic: show runtime and gem paths right before pod install
-          echo "== Diagnostic: ruby & gem info before pod install =="
-          echo "which ruby: $(which ruby)"
-          ruby -v || true
-          echo "HOSTED_RUBY_BIN=$HOSTED_RUBY_BIN"
-          ruby -e 'require "rubygems"; puts "Gem.path:"; puts Gem.path' || true
-          echo "GEM_HOME=$GEM_HOME GEM_PATH=$GEM_PATH RUBYLIB=$RUBYLIB RUBYOPT=$RUBYOPT"
-          "$HOSTED_RUBY_BIN" -S bundle env | sed -n '1,120p' || true
-          # Show pod/bin shebang (if present)
-          if command -v pod >/dev/null 2>&1; then
-            echo "pod binstub shebang:"; head -n 1 "$(command -v pod)" || true
-          else
-            echo "pod not on PATH; showing possible vendor binstub:"; head -n 1 ios/vendor/bundle/ruby/*/bin/pod 2>/dev/null || true
-          fi
+      # - name: Phase 3 - Start interactive debug session (tmate)
+      #   if: github.ref == 'refs/heads/mobile-qa'
+      #   uses: mxschmitt/action-tmate@v3
+      #   id: tmate
+      #   with:
+      #     # Start tmate in detached mode so the workflow continues and we can keep a separate
+      #     # sleep window to allow connection. The action prints SSH and web connection info.
+      #     detached: true
+      #     # Restrict access to the actor's registered public SSH keys (safer than allowing anyone)
+      #     limit-access-to-actor: true
 
-      - name: Phase 3 - Start interactive debug session (tmate)
-        if: github.ref == 'refs/heads/mobile-qa'
-        uses: mxschmitt/action-tmate@v3
-        id: tmate
-        with:
-          # Start tmate in detached mode so the workflow continues and we can keep a separate
-          # sleep window to allow connection. The action prints SSH and web connection info.
-          detached: true
-          # Restrict access to the actor's registered public SSH keys (safer than allowing anyone)
-          limit-access-to-actor: true
-
-      - name: Phase 3 - Keep debug window open briefly
-        if: github.ref == 'refs/heads/mobile-qa'
-        run: |
-          echo "Debug window open for 1 hour (3600s). Connect via tmate now and run diagnostics."
-          # give operator time to connect and inspect the runner
-          sleep 3600
+      # - name: Phase 3 - Keep debug window open briefly
+      #   if: github.ref == 'refs/heads/mobile-qa'
+      #   run: |
+      #     echo "Debug window open for 1 hour (3600s). Connect via tmate now and run diagnostics."
+      #     # give operator time to connect and inspect the runner
+      #     sleep 3600
 
       - name: Phase 3 - Install iOS Pods & validate
         working-directory: ios
         run: |
-          # Remove any pod binstub that might be shebanged to Homebrew Ruby
-          rm -f ios/vendor/bundle/ruby/*/bin/pod || true
-          # Ensure gems from ios/Gemfile (and ios/Gemfile.lock) are installed into vendor/bundle
-          echo "== CI: installing gems into ios/vendor/bundle (bundle install) =="
+          HOSTED_RUBY_BIN=$(which ruby)
           export GEM_HOME="$PWD/vendor/bundle"
           export GEM_PATH="$GEM_HOME"
           unset RUBYOPT
           unset RUBYLIB
-          # Install Bundler-managed gems into the repository vendor/bundle (fail the job on error)
+
+          # Install gems via Bundler
           "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- bundle install --jobs=4 --retry=3
 
-          # Run CocoaPods via the Ruby API under bundle exec (bypass pod binstub shebangs)
-          "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- bundle exec ruby -e 'require "bundler/setup"; require "cocoapods"; Pod::Command.run(["install","--repo-update"])' || exit $?
+          # Run CocoaPods via the Ruby API under bundle exec
+          "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- \
+            bundle exec ruby -e 'require "bundler/setup"; require "cocoapods"; Pod::Command.run(["install","--repo-update"])'
 
-          echo "== Pod install exit: $? "
+          echo "Pod install completed"
 
           # Basic sanity checks - fail the job if required Pod support files for flavors are missing
           MISSING=0
@@ -293,16 +228,12 @@ jobs:
             fi
           done
 
-          # Show generated xcfilelists for debugging
-          echo "Listing xcfilelist files (if present):"
-          ls -1 Pods/Target\ Support\ Files/Pods-Runner/*.xcfilelist || true
-
           if [ "$MISSING" -eq 1 ]; then
             echo "One or more required Pod support files are missing; failing the job."
             exit 2
           fi
 
-          echo "Phase 3 completed: pods installed and basic validation passed ✓"
+          echo "Phase 3 completed: pods installed and validated ✓"
 
   # Phase 5 — Non-prod builds (QA, Staging) - auto-deploy to Internal/TestFlight
   build-nonprod:
@@ -351,34 +282,14 @@ jobs:
       - name: Install Bundler
         run: gem install bundler -v 2.6.9 --no-document
 
-      - name: "Debug: PATH & Ruby env after installing Bundler"
-        run: |
-          echo "== PATH =="
-          echo "$PATH"
-          echo "== which executables =="
-          which ruby || true
-          which gem || true
-          which bundle || true
-          echo "== gem env =="
-          gem env || true
-          echo "== env vars affecting Ruby/Bundler =="
-          env | grep -i "GEM\|RUBY\|BUNDLE" || true
-          echo "== List Homebrew ruby dirs (if present) =="
-          ls -la /opt/homebrew/lib/ruby || true
-          ls -la /opt/homebrew/opt/ruby* || true
-
       - name: "Sanitize Ruby env (remove Homebrew ruby paths)"
         run: |
-          echo "== Sanitizing Ruby environment: removing Homebrew Ruby entries =="
           NEW_PATH=$(echo "$PATH" | tr ':' '\n' | grep -vE '/opt/homebrew/opt/ruby(@[0-9.]+)?/bin|/opt/homebrew/lib/ruby' | paste -sd: -)
           echo "PATH=$NEW_PATH" >> $GITHUB_ENV
           echo "GEM_HOME=" >> $GITHUB_ENV
           echo "GEM_PATH=" >> $GITHUB_ENV
           echo "RUBYLIB=" >> $GITHUB_ENV
           echo "RUBYOPT=" >> $GITHUB_ENV
-          echo "Sanitized PATH: $NEW_PATH"
-          ruby -e 'puts $LOAD_PATH' || true
-          gem env || true
 
       - name: Cache ios/vendor/bundle
         uses: actions/cache@v4
@@ -401,19 +312,6 @@ jobs:
           export GEM_PATH="$GEM_HOME"
           unset RUBYOPT RUBYLIB
           "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- bundle install --jobs=4 --retry=3
-
-      - name: "Debug: show Ruby/Bundler and ios/vendor/bundle"
-        run: |
-          echo "== Ruby & Bundler info =="
-          which ruby || true
-          ruby --version || true
-          which gem || true
-          gem env || true
-          bundle --version || true
-          echo "== ios/vendor/bundle contents =="
-          ls -la ios/vendor/bundle || echo "ios/vendor/bundle does not exist or is empty"
-          echo "== native extension files (if any) =="
-          find ios/vendor/bundle -type f \( -name '*.so' -o -name '*.bundle' \) -print || true
 
       - name: Cache android/vendor/bundle
         uses: actions/cache@v4
@@ -575,26 +473,13 @@ jobs:
         working-directory: ios
         run: |
           HOSTED_RUBY_BIN=$(which ruby)
-          echo "Using hosted ruby: $HOSTED_RUBY_BIN"
           export GEM_HOME="$PWD/vendor/bundle"
           export GEM_PATH="$GEM_HOME"
           unset RUBYOPT
           unset RUBYLIB
-          echo "== Diagnostic: ruby & gem info before pod install (build job) =="
-          echo "which ruby: $(which ruby)"
-          ruby -v || true
-          echo "HOSTED_RUBY_BIN=$HOSTED_RUBY_BIN"
-          ruby -e 'require "rubygems"; puts "Gem.path:"; puts Gem.path' || true
-          echo "GEM_HOME=$GEM_HOME GEM_PATH=$GEM_PATH RUBYLIB=$RUBYLIB RUBYOPT=$RUBYOPT"
-          "$HOSTED_RUBY_BIN" -S bundle env | sed -n '1,120p' || true
-          if command -v pod >/dev/null 2>&1; then
-            echo "pod binstub shebang:"; head -n 1 "$(command -v pod)" || true
-          else
-            echo "pod not on PATH; showing possible vendor binstub:"; head -n 1 ios/vendor/bundle/ruby/*/bin/pod 2>/dev/null || true
-          fi
-          # Remove any pod binstub that might be shebanged to Homebrew Ruby
-          rm -f ios/vendor/bundle/ruby/*/bin/pod || true
-          "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- bundle exec ruby -e 'require "bundler/setup"; require "cocoapods"; Pod::Command.run(["install", "--repo-update"])'
+
+          "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- \
+            bundle exec ruby -e 'require "bundler/setup"; require "cocoapods"; Pod::Command.run(["install","--repo-update"])'
 
       - name: Run Fastlane Match (iOS)
         working-directory: ios
@@ -725,34 +610,14 @@ jobs:
       - name: Install Bundler
         run: gem install bundler -v 2.6.9 --no-document
 
-      - name: "Debug: PATH & Ruby env after installing Bundler"
-        run: |
-          echo "== PATH =="
-          echo "$PATH"
-          echo "== which executables =="
-          which ruby || true
-          which gem || true
-          which bundle || true
-          echo "== gem env =="
-          gem env || true
-          echo "== env vars affecting Ruby/Bundler =="
-          env | grep -i "GEM\|RUBY\|BUNDLE" || true
-          echo "== List Homebrew ruby dirs (if present) =="
-          ls -la /opt/homebrew/lib/ruby || true
-          ls -la /opt/homebrew/opt/ruby* || true
-
       - name: "Sanitize Ruby env (remove Homebrew ruby paths)"
         run: |
-          echo "== Sanitizing Ruby environment: removing Homebrew Ruby entries =="
           NEW_PATH=$(echo "$PATH" | tr ':' '\n' | grep -vE '/opt/homebrew/opt/ruby(@[0-9.]+)?/bin|/opt/homebrew/lib/ruby' | paste -sd: -)
           echo "PATH=$NEW_PATH" >> $GITHUB_ENV
           echo "GEM_HOME=" >> $GITHUB_ENV
           echo "GEM_PATH=" >> $GITHUB_ENV
           echo "RUBYLIB=" >> $GITHUB_ENV
           echo "RUBYOPT=" >> $GITHUB_ENV
-          echo "Sanitized PATH: $NEW_PATH"
-          ruby -e 'puts $LOAD_PATH' || true
-          gem env || true
 
       - name: Cache ios/vendor/bundle
         uses: actions/cache@v4
@@ -907,26 +772,13 @@ jobs:
         working-directory: ios
         run: |
           HOSTED_RUBY_BIN=$(which ruby)
-          echo "Using hosted ruby: $HOSTED_RUBY_BIN"
           export GEM_HOME="$PWD/vendor/bundle"
           export GEM_PATH="$GEM_HOME"
           unset RUBYOPT
           unset RUBYLIB
-          echo "== Diagnostic: ruby & gem info before pod install (prod build job) =="
-          echo "which ruby: $(which ruby)"
-          ruby -v || true
-          echo "HOSTED_RUBY_BIN=$HOSTED_RUBY_BIN"
-          ruby -e 'require "rubygems"; puts "Gem.path:"; puts Gem.path' || true
-          echo "GEM_HOME=$GEM_HOME GEM_PATH=$GEM_PATH RUBYLIB=$RUBYLIB RUBYOPT=$RUBYOPT"
-          "$HOSTED_RUBY_BIN" -S bundle env | sed -n '1,120p' || true
-          if command -v pod >/dev/null 2>&1; then
-            echo "pod binstub shebang:"; head -n 1 "$(command -v pod)" || true
-          else
-            echo "pod not on PATH; showing possible vendor binstub:"; head -n 1 ios/vendor/bundle/ruby/*/bin/pod 2>/dev/null || true
-          fi
-          # Remove any pod binstub that might be shebanged to Homebrew Ruby
-          rm -f ios/vendor/bundle/ruby/*/bin/pod || true
-          "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- bundle exec ruby -e 'require "bundler/setup"; require "cocoapods"; Pod::Command.run(["install", "--repo-update"])'
+
+          "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- \
+            bundle exec ruby -e 'require "bundler/setup"; require "cocoapods"; Pod::Command.run(["install","--repo-update"])'
 
       - name: Run Fastlane Match (iOS - appstore)
         working-directory: ios
