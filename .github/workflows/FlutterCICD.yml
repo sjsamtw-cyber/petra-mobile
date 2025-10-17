@@ -436,6 +436,14 @@ jobs:
           restore-keys: |
             gradle-cache-${{ runner.os }}-
 
+      - name: Create local.properties for CI
+        working-directory: android
+        run: |
+          # Provide a minimal local.properties for CI so settings.gradle.kts can read flutter.sdk
+          echo "flutter.sdk=$FLUTTER_ROOT" > local.properties
+          # Standard macOS hosted runner Android SDK path
+          echo "sdk.dir=/Users/runner/Library/Android/sdk" >> local.properties
+
       - name: Build Android (flavor from branch)
         working-directory: android
         run: |
