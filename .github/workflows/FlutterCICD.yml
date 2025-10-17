@@ -444,6 +444,21 @@ jobs:
           # Standard macOS hosted runner Android SDK path
           echo "sdk.dir=/Users/runner/Library/Android/sdk" >> local.properties
 
+      - name: Install Flutter dependencies
+        run: |
+          echo "Running flutter pub get to generate .dart_tool/package_config.json"
+          flutter pub get
+
+      - name: Create key.properties for CI
+        working-directory: android
+        run: |
+          # Create key.properties dynamically from environment variables set in Phase 4b
+          echo "storeFile=$KEYSTORE_FILE" > key.properties
+          echo "storePassword=$KEYSTORE_PASSWORD" >> key.properties
+          echo "keyPassword=$KEY_PASSWORD" >> key.properties
+          echo "keyAlias=$KEY_ALIAS" >> key.properties
+          echo "Android key.properties created for CI ✓"
+
       - name: Build Android (flavor from branch)
         working-directory: android
         run: |
@@ -744,6 +759,29 @@ jobs:
           key: gradle-cache-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             gradle-cache-${{ runner.os }}-
+
+      - name: Create local.properties for CI
+        working-directory: android
+        run: |
+          # Provide a minimal local.properties for CI so settings.gradle.kts can read flutter.sdk
+          echo "flutter.sdk=$FLUTTER_ROOT" > local.properties
+          # Standard macOS hosted runner Android SDK path
+          echo "sdk.dir=/Users/runner/Library/Android/sdk" >> local.properties
+
+      - name: Install Flutter dependencies
+        run: |
+          echo "Running flutter pub get to generate .dart_tool/package_config.json"
+          flutter pub get
+
+      - name: Create key.properties for CI
+        working-directory: android
+        run: |
+          # Create key.properties dynamically from environment variables set in Phase 4b
+          echo "storeFile=$KEYSTORE_FILE" > key.properties
+          echo "storePassword=$KEYSTORE_PASSWORD" >> key.properties
+          echo "keyPassword=$KEY_PASSWORD" >> key.properties
+          echo "keyAlias=$KEY_ALIAS" >> key.properties
+          echo "Android key.properties created for CI ✓"
 
       - name: Build Android (prod)
         working-directory: android
