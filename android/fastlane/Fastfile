@@ -48,17 +48,39 @@ platform :android do
     json_key_file = "/tmp/play-service-account-#{flavor}.json"
     File.write(json_key_file, service_account_json)
     
-    # Upload to Play Store
+    # Locate AAB and mapping artifacts dynamically (works across AGP/Flutter variations)
+    aab_globs = [
+      "app/build/outputs/bundle/#{flavor}Release/*.aab",
+      "app/build/outputs/bundle/**/#{flavor}Release/*.aab",
+      "app/build/outputs/bundle/**/*#{flavor}*.aab",
+    ]
+
+    aab_path = nil
+    aab_globs.each do |g|
+      found = Dir.glob(g).select { |p| File.file?(p) }.first
+      if found
+        aab_path = found
+        break
+      end
+    end
+
+    unless aab_path && File.exist?(aab_path)
+      UI.user_error!("Could not find AAB for flavor '#{flavor}'. Searched globs: #{aab_globs.join(', ')}")
+    end
+
+    # Locate mapping file (optional)
+    mapping_path = Dir.glob("app/build/outputs/mapping/**/#{flavor}Release/mapping*.txt").select { |p| File.file?(p) }.first
+
     upload_to_play_store(
       package_name: "com.petrasoftsolutions.mobile.#{flavor}",
       track: track,
-      aab: "app/build/outputs/bundle/#{flavor}Release/app-#{flavor}-release.aab",
+      aab: aab_path,
       json_key: json_key_file,
       skip_upload_apk: true,
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true,
-      mapping: "app/build/outputs/mapping/#{flavor}Release/mapping.txt"
+      mapping: mapping_path
     )
     
     # Clean up temp file
