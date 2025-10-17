@@ -504,8 +504,9 @@ jobs:
         with:
           name: android-${{ steps.determine_flavor.outputs.flavor }}-${{ github.run_number }}
           path: |
-            android/app/build/outputs/bundle/**/*.aab
-            android/app/build/outputs/mapping/**/*.txt
+            # Only include top-level Flutter build outputs (CI produces bundles here)
+            build/app/outputs/bundle/**/*.aab
+            build/app/outputs/mapping/**/*.txt
           retention-days: 30
 
       - name: Install iOS Pods (build job)
@@ -827,8 +828,9 @@ jobs:
         with:
           name: android-prod-${{ github.run_number }}
           path: |
-            android/app/build/outputs/bundle/**/*.aab
-            android/app/build/outputs/mapping/**/*.txt
+            # Only include top-level Flutter build outputs (CI produces bundles here)
+            build/app/outputs/bundle/**/*.aab
+            build/app/outputs/mapping/**/*.txt
           retention-days: 90
 
       - name: Install iOS Pods (build job)

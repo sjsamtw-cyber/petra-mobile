@@ -49,10 +49,14 @@ platform :android do
     File.write(json_key_file, service_account_json)
     
     # Locate AAB and mapping artifacts dynamically (works across AGP/Flutter variations)
+    # Search both the module-local build dir (app/build/...) and Flutter's top-level
+    # build/app/... layout where Flutter sometimes writes bundles on CI.
     aab_globs = [
-      "app/build/outputs/bundle/#{flavor}Release/*.aab",
-      "app/build/outputs/bundle/**/#{flavor}Release/*.aab",
-      "app/build/outputs/bundle/**/*#{flavor}*.aab",
+      # Flutter/CI top-level build output paths
+      "build/app/outputs/bundle/#{flavor}Release/*.aab",
+      "build/app/outputs/bundle/**/#{flavor}Release/*.aab",
+      "build/app/outputs/bundle/**/*#{flavor}*.aab",
+      "build/app/**/*.aab",
     ]
 
     aab_path = nil
@@ -69,7 +73,11 @@ platform :android do
     end
 
     # Locate mapping file (optional)
+    # Try both app/build and build/app mapping locations
     mapping_path = Dir.glob("app/build/outputs/mapping/**/#{flavor}Release/mapping*.txt").select { |p| File.file?(p) }.first
+    if mapping_path.nil?
+      mapping_path = Dir.glob("build/app/outputs/mapping/**/#{flavor}Release/mapping*.txt").select { |p| File.file?(p) }.first
+    end
 
     upload_to_play_store(
       package_name: "com.petrasoftsolutions.mobile.#{flavor}",
