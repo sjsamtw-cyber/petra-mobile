@@ -419,7 +419,8 @@ jobs:
           echo "Keystore verification passed ✓"
 
           # Set signing environment variables for Gradle
-          echo "KEYSTORE_FILE=petra-nonprod-key.jks" >> $GITHUB_ENV
+          # Export absolute path to keystore so Gradle/Fastlane find it regardless of project cwd
+          echo "KEYSTORE_FILE=$PWD/android/petra-nonprod-key.jks" >> $GITHUB_ENV
           echo "KEYSTORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_NONPROD_STORE_PASSWORD }}" >> $GITHUB_ENV
           echo "KEY_ALIAS=${{ secrets.ANDROID_KEYSTORE_NONPROD_KEY_ALIAS }}" >> $GITHUB_ENV
           echo "KEY_PASSWORD=${{ secrets.ANDROID_KEYSTORE_NONPROD_KEY_PASSWORD }}" >> $GITHUB_ENV
@@ -743,7 +744,8 @@ jobs:
           echo "Keystore verification passed ✓"
 
           # Set signing environment variables for Gradle
-          echo "KEYSTORE_FILE=petra-release-key.jks" >> $GITHUB_ENV
+          # Export absolute path to keystore so Gradle/Fastlane find it regardless of project cwd
+          echo "KEYSTORE_FILE=$PWD/android/petra-release-key.jks" >> $GITHUB_ENV
           echo "KEYSTORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PROD_STORE_PASSWORD }}" >> $GITHUB_ENV
           echo "KEY_ALIAS=${{ secrets.ANDROID_KEYSTORE_PROD_KEY_ALIAS }}" >> $GITHUB_ENV
           echo "KEY_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PROD_KEY_PASSWORD }}" >> $GITHUB_ENV
