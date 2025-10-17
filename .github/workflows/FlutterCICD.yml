@@ -473,6 +473,21 @@ jobs:
           KEY_ALIAS: ${{ env.KEY_ALIAS }}
           KEY_PASSWORD: ${{ env.KEY_PASSWORD }}
 
+      - name: Start interactive debug session (tmate) for QA
+        if: steps.determine_flavor.outputs.flavor == 'qa'
+        uses: mxschmitt/action-tmate@v3
+        id: tmate
+        with:
+          detached: true
+          limit-access-to-actor: true
+
+      - name: Keep debug window open for QA
+        if: steps.determine_flavor.outputs.flavor == 'qa'
+        run: |
+          echo "Debug window open for 1 hour (3600s). Connect via tmate now and run diagnostics."
+          # give operator time to connect and inspect the runner
+          sleep 3600
+
       - name: Upload Android to Play Store
         if: steps.determine_flavor.outputs.flavor == 'qa' || steps.determine_flavor.outputs.flavor == 'staging'
         working-directory: android
