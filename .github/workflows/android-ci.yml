@@ -195,6 +195,12 @@ jobs:
         run: |
           echo "flutter.sdk=$FLUTTER_ROOT" > local.properties
           echo "sdk.dir=$ANDROID_HOME" >> local.properties
+          # parse pubspec.yaml (project root) for version and write flutter.* keys
+          if [ -f ../pubspec.yaml ]; then
+            ruby -ryaml -e "v=YAML.load_file('../pubspec.yaml')['version']; name,code = v.to_s.split('+'); puts \"flutter.versionName=#{name}\"; puts \"flutter.versionCode=#{code}\"" >> local.properties
+          else
+            echo "# pubspec.yaml not found; skipping flutter.versionName/flutter.versionCode" >> local.properties
+          fi
 
       - name: Install Flutter dependencies
         run: flutter pub get
@@ -222,7 +228,6 @@ jobs:
           bundle exec fastlane build flavor:$FLAVOR
         env:
           BUILD_NAME: 1.0.0
-          BUILD_NUMBER: ${{ github.run_number }}
           KEYSTORE_FILE: ${{ env.KEYSTORE_FILE }}
           KEYSTORE_PASSWORD: ${{ env.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ env.KEY_ALIAS }}
@@ -353,6 +358,12 @@ jobs:
         run: |
           echo "flutter.sdk=$FLUTTER_ROOT" > local.properties
           echo "sdk.dir=$ANDROID_HOME" >> local.properties
+          # parse pubspec.yaml (project root) for version and write flutter.* keys
+          if [ -f ../pubspec.yaml ]; then
+            ruby -ryaml -e "v=YAML.load_file('../pubspec.yaml')['version']; name,code = v.to_s.split('+'); puts \"flutter.versionName=#{name}\"; puts \"flutter.versionCode=#{code}\"" >> local.properties
+          else
+            echo "# pubspec.yaml not found; skipping flutter.versionName/flutter.versionCode" >> local.properties
+          fi
 
       - name: Install Flutter dependencies
         run: flutter pub get
@@ -372,7 +383,6 @@ jobs:
           bundle exec fastlane build flavor:prod
         env:
           BUILD_NAME: 1.0.0
-          BUILD_NUMBER: ${{ github.run_number }}
           KEYSTORE_FILE: ${{ env.KEYSTORE_FILE }}
           KEYSTORE_PASSWORD: ${{ env.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ env.KEY_ALIAS }}
