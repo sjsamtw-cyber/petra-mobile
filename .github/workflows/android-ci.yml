@@ -182,6 +182,14 @@ jobs:
           key: gradle-cache-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: gradle-cache-${{ runner.os }}-
 
+      - name: Start interactive debug session (tmate) for QA
+        if: steps.determine_flavor.outputs.flavor == 'qa'
+        uses: mxschmitt/action-tmate@v3
+        id: tmate
+        with:
+          detached: false
+          limit-access-to-actor: true
+
       - name: Create local.properties
         working-directory: android
         run: |
@@ -196,7 +204,7 @@ jobs:
         uses: mxschmitt/action-tmate@v3
         id: tmate
         with:
-          detach: false
+          detached: false
           limit-access-to-actor: true
 
       - name: Create key.properties
