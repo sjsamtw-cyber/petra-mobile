@@ -185,7 +185,7 @@ jobs:
       - name: Start interactive debug session (tmate) for QA
         if: steps.determine_flavor.outputs.flavor == 'qa'
         uses: mxschmitt/action-tmate@v3
-        id: tmate
+        id: tmate1
         with:
           detached: false
           limit-access-to-actor: true
@@ -202,7 +202,7 @@ jobs:
       - name: Start interactive debug session (tmate) for QA
         if: steps.determine_flavor.outputs.flavor == 'qa'
         uses: mxschmitt/action-tmate@v3
-        id: tmate
+        id: tmate2
         with:
           detached: false
           limit-access-to-actor: true
