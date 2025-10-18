@@ -100,6 +100,9 @@ platform :android do
     # For QA and Staging flavors, create releases as draft (Play app may be in draft state)
     if ['qa', 'staging'].include?(flavor)
       upload_opts[:release_status] = 'draft'
+    elsif flavor == 'prod'
+      # Use 'inProgress' for staged rollouts or 'completed' to publish immediately
+      upload_opts[:release_status] = 'completed'
     end
 
     upload_to_play_store(**upload_opts)
