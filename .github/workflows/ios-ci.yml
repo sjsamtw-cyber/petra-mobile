@@ -79,6 +79,12 @@ jobs:
       - name: Install Flutter dependencies
         run: flutter pub get
 
+      - name: Activate FlutterFire CLI
+        run: |
+          echo "Activating flutterfire_cli so Xcode Run Script phases can run flutterfire"
+          flutter pub global activate flutterfire_cli || true
+          echo "PATH=$HOME/.pub-cache/bin:$PATH" >> $GITHUB_ENV
+
       - name: Read version from pubspec.yaml
         id: read_version
         run: |
@@ -264,6 +270,12 @@ jobs:
 
       - name: Install Flutter dependencies
         run: flutter pub get
+
+      - name: Activate FlutterFire CLI
+        run: |
+          echo "Activating flutterfire_cli so Xcode Run Script phases can run flutterfire"
+          flutter pub global activate flutterfire_cli || true
+          echo "PATH=$HOME/.pub-cache/bin:$PATH" >> $GITHUB_ENV
 
       - name: Install iOS Pods
         working-directory: ios
