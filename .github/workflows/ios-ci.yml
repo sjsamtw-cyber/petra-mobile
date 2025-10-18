@@ -39,8 +39,7 @@ jobs:
 
       - name: Sanitize Ruby env
         run: |
-          NEW_PATH=$(echo "$PATH" | tr ':' '
-' | grep -vE '/opt/homebrew/opt/ruby(@[0-9.]+)?/bin|/opt/homebrew/lib/ruby' | paste -sd: -)
+          NEW_PATH=$(echo "$PATH" | tr ':' '\n' | grep -vE '/opt/homebrew/opt/ruby(@[0-9.]+)?/bin|/opt/homebrew/lib/ruby' | paste -sd: -)
           echo "PATH=$NEW_PATH" >> $GITHUB_ENV
           echo "GEM_HOME=" >> $GITHUB_ENV
           echo "GEM_PATH=" >> $GITHUB_ENV
@@ -159,19 +158,19 @@ jobs:
 
       - name: Sanitize Ruby env
         run: |
-          NEW_PATH=\$(echo "\$PATH" | tr ':' '\n' | grep -vE '/opt/homebrew/opt/ruby(@[0-9.]+)?/bin|/opt/homebrew/lib/ruby' | paste -sd: -)
-          echo "PATH=\$NEW_PATH" >> \$GITHUB_ENV
-          echo "GEM_HOME=" >> \$GITHUB_ENV
-          echo "GEM_PATH=" >> \$GITHUB_ENV
-          echo "RUBYLIB=" >> \$GITHUB_ENV
-          echo "RUBYOPT=" >> \$GITHUB_ENV
+          NEW_PATH=$(echo "$PATH" | tr ':' '\n' | grep -vE '/opt/homebrew/opt/ruby(@[0-9.]+)?/bin|/opt/homebrew/lib/ruby' | paste -sd: -)
+          echo "PATH=$NEW_PATH" >> $GITHUB_ENV
+          echo "GEM_HOME=" >> $GITHUB_ENV
+          echo "GEM_PATH=" >> $GITHUB_ENV
+          echo "RUBYLIB=" >> $GITHUB_ENV
+          echo "RUBYOPT=" >> $GITHUB_ENV
 
       - name: Cache ios/vendor/bundle
         uses: actions/cache@v4
         with:
           path: ios/vendor/bundle
-          key: \${{ runner.os }}-ruby-3.3-bundler-2.6.9-ios-\${{ hashFiles('ios/Gemfile.lock') }}
-          restore-keys: \${{ runner.os }}-ruby-3.3-bundler-2.6.9-ios-
+          key: ${{ runner.os }}-ruby-3.3-bundler-2.6.9-ios-${{ hashFiles('ios/Gemfile.lock') }}
+          restore-keys: ${{ runner.os }}-ruby-3.3-bundler-2.6.9-ios-
 
       - name: Install iOS dependencies
         working-directory: ios
@@ -180,30 +179,30 @@ jobs:
           bundle config set --local deployment 'true'
           bundle config set --local without 'development test'
           bundle config set --local path 'vendor/bundle'
-          HOSTED_RUBY_BIN=\$(which ruby)
-          export GEM_HOME="\$PWD/vendor/bundle"
-          export GEM_PATH="\$GEM_HOME"
+          HOSTED_RUBY_BIN=$(which ruby)
+          export GEM_HOME="$PWD/vendor/bundle"
+          export GEM_PATH="$GEM_HOME"
           unset RUBYOPT RUBYLIB
-          "\$HOSTED_RUBY_BIN" -e 'begin; \$LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- bundle install --jobs=4 --retry=3
+          "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- bundle install --jobs=4 --retry=3
 
       - name: Determine flavor from branch
         id: determine_flavor
         run: |
-          if [ -n "\${GITHUB_HEAD_REF}" ]; then
-            BRANCH_NAME=\${GITHUB_HEAD_REF}
+          if [ -n "${GITHUB_HEAD_REF}" ]; then
+            BRANCH_NAME=${GITHUB_HEAD_REF}
           else
-            BRANCH_NAME=\${GITHUB_REF#refs/heads/}
+            BRANCH_NAME=${GITHUB_REF#refs/heads/}
           fi
-          echo "Branch detected: \$BRANCH_NAME"
-          if [[ "\$BRANCH_NAME" == "main" ]]; then
+          echo "Branch detected: $BRANCH_NAME"
+          if [[ "$BRANCH_NAME" == "main" ]]; then
             FLAV=dev
-          elif [[ "\$BRANCH_NAME" =~ ^mobile-(dev|qa|staging|prod)\$ ]]; then
-            FLAV=\${BRANCH_NAME#mobile-}
+          elif [[ "$BRANCH_NAME" =~ ^mobile-(dev|qa|staging|prod)$ ]]; then
+            FLAV=${BRANCH_NAME#mobile-}
           else
             FLAV=dev
           fi
-          echo "FLAVOR=\$FLAV" >> \$GITHUB_ENV
-          echo "flavor=\$FLAV" >> \$GITHUB_OUTPUT
+          echo "FLAVOR=$FLAV" >> $GITHUB_ENV
+          echo "flavor=$FLAV" >> $GITHUB_OUTPUT
 
       - name: Set up iOS signing (Fastlane Match)
         run: |
@@ -212,24 +211,24 @@ jobs:
           security default-keychain -s build.keychain
           security unlock-keychain -p "" build.keychain
           security set-keychain-settings -t 3600 -u build.keychain
-          
-          if [[ "\$FLAVOR" == "prod" ]]; then
-            echo "MATCH_TYPE=appstore" >> \$GITHUB_ENV
+
+          if [[ "$FLAVOR" == "prod" ]]; then
+            echo "MATCH_TYPE=appstore" >> $GITHUB_ENV
           else
-            echo "MATCH_TYPE=adhoc" >> \$GITHUB_ENV
+            echo "MATCH_TYPE=adhoc" >> $GITHUB_ENV
           fi
-          
+
           mkdir -p ~/.ssh
-          echo "\${{ secrets.MATCH_GIT_PRIVATE_KEY }}" > ~/.ssh/match_deploy_key
+          echo "${{ secrets.MATCH_GIT_PRIVATE_KEY }}" > ~/.ssh/match_deploy_key
           chmod 600 ~/.ssh/match_deploy_key
           ssh-keyscan github.com >> ~/.ssh/known_hosts
-          
+
           export GIT_SSH_COMMAND="ssh -i ~/.ssh/match_deploy_key -o IdentitiesOnly=yes"
-          echo "GIT_SSH_COMMAND=ssh -i ~/.ssh/match_deploy_key -o IdentitiesOnly=yes" >> \$GITHUB_ENV
-          echo "MATCH_GIT_URL=\${{ secrets.MATCH_GIT_URL }}" >> \$GITHUB_ENV
-          echo "MATCH_GIT_BRANCH=\${{ secrets.MATCH_GIT_BRANCH }}" >> \$GITHUB_ENV
+          echo "GIT_SSH_COMMAND=ssh -i ~/.ssh/match_deploy_key -o IdentitiesOnly=yes" >> $GITHUB_ENV
+          echo "MATCH_GIT_URL=${{ secrets.MATCH_GIT_URL }}" >> $GITHUB_ENV
+          echo "MATCH_GIT_BRANCH=${{ secrets.MATCH_GIT_BRANCH }}" >> $GITHUB_ENV
         env:
-          FLAVOR: \${{ env.FLAVOR }}
+          FLAVOR: ${{ env.FLAVOR }}
 
       - name: Install Flutter dependencies
         run: flutter pub get
@@ -237,54 +236,54 @@ jobs:
       - name: Install iOS Pods
         working-directory: ios
         run: |
-          HOSTED_RUBY_BIN=\$(which ruby)
-          export GEM_HOME="\$PWD/vendor/bundle"
-          export GEM_PATH="\$GEM_HOME"
+          HOSTED_RUBY_BIN=$(which ruby)
+          export GEM_HOME="$PWD/vendor/bundle"
+          export GEM_PATH="$GEM_HOME"
           unset RUBYOPT RUBYLIB
-          "\$HOSTED_RUBY_BIN" -e 'begin; \$LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- \\
+          "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- \
             bundle exec ruby -e 'require "bundler/setup"; require "cocoapods"; Pod::Command.run(["install","--repo-update"])'
 
       - name: Run Fastlane Match
         working-directory: ios
         run: |
-          echo "Fetching certificates via Match (type: \$MATCH_TYPE)"
+          echo "Fetching certificates via Match (type: $MATCH_TYPE)"
           bundle exec fastlane fetch_certificates
         env:
-          MATCH_GIT_URL: \${{ secrets.MATCH_GIT_URL }}
-          MATCH_GIT_BRANCH: \${{ secrets.MATCH_GIT_BRANCH }}
-          MATCH_TYPE: \${{ env.MATCH_TYPE }}
-          MATCH_PASSWORD: \${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_GIT_BRANCH: ${{ secrets.MATCH_GIT_BRANCH }}
+          MATCH_TYPE: ${{ env.MATCH_TYPE }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
 
       - name: Build iOS
         working-directory: ios
         run: |
-          echo "Building iOS flavor: \$FLAVOR"
-          bundle exec fastlane build flavor:\$FLAVOR
+          echo "Building iOS flavor: $FLAVOR"
+          bundle exec fastlane build flavor:$FLAVOR
         env:
           BUILD_NAME: 1.0.0
-          BUILD_NUMBER: \${{ github.run_number }}
-          MATCH_TYPE: \${{ env.MATCH_TYPE }}
-          APP_STORE_CONNECT_KEY_ID: \${{ secrets.APP_STORE_CONNECT_KEY_ID }}
-          APP_STORE_CONNECT_ISSUER_ID: \${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-          APP_STORE_CONNECT_API_KEY_BASE64: \${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+          BUILD_NUMBER: ${{ github.run_number }}
+          MATCH_TYPE: ${{ env.MATCH_TYPE }}
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
 
       - name: Upload iOS to TestFlight
         if: steps.determine_flavor.outputs.flavor == 'qa' || steps.determine_flavor.outputs.flavor == 'staging'
         working-directory: ios
         run: |
-          echo "Uploading iOS flavor: \$FLAVOR to TestFlight (Internal)"
-          bundle exec fastlane upload flavor:\$FLAVOR
+          echo "Uploading iOS flavor: $FLAVOR to TestFlight (Internal)"
+          bundle exec fastlane upload flavor:$FLAVOR
         env:
-          MATCH_TYPE: \${{ env.MATCH_TYPE }}
-          APP_STORE_CONNECT_KEY_ID: \${{ secrets.APP_STORE_CONNECT_KEY_ID }}
-          APP_STORE_CONNECT_ISSUER_ID: \${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-          APP_STORE_CONNECT_API_KEY_BASE64: \${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+          MATCH_TYPE: ${{ env.MATCH_TYPE }}
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
 
       - name: Upload iOS artifacts
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: ios-\${{ steps.determine_flavor.outputs.flavor }}-\${{ github.run_number }}
+          name: ios-${{ steps.determine_flavor.outputs.flavor }}-${{ github.run_number }}
           path: |
             ios/build/*.ipa
             ios/build/*.dSYM.zip
@@ -334,19 +333,19 @@ jobs:
 
       - name: Sanitize Ruby env
         run: |
-          NEW_PATH=\$(echo "\$PATH" | tr ':' '\n' | grep -vE '/opt/homebrew/opt/ruby(@[0-9.]+)?/bin|/opt/homebrew/lib/ruby' | paste -sd: -)
-          echo "PATH=\$NEW_PATH" >> \$GITHUB_ENV
-          echo "GEM_HOME=" >> \$GITHUB_ENV
-          echo "GEM_PATH=" >> \$GITHUB_ENV
-          echo "RUBYLIB=" >> \$GITHUB_ENV
-          echo "RUBYOPT=" >> \$GITHUB_ENV
+          NEW_PATH=$(echo "$PATH" | tr ':' '\n' | grep -vE '/opt/homebrew/opt/ruby(@[0-9.]+)?/bin|/opt/homebrew/lib/ruby' | paste -sd: -)
+          echo "PATH=$NEW_PATH" >> $GITHUB_ENV
+          echo "GEM_HOME=" >> $GITHUB_ENV
+          echo "GEM_PATH=" >> $GITHUB_ENV
+          echo "RUBYLIB=" >> $GITHUB_ENV
+          echo "RUBYOPT=" >> $GITHUB_ENV
 
       - name: Cache ios/vendor/bundle
         uses: actions/cache@v4
         with:
           path: ios/vendor/bundle
-          key: \${{ runner.os }}-ruby-3.3-bundler-2.6.9-ios-\${{ hashFiles('ios/Gemfile.lock') }}
-          restore-keys: \${{ runner.os }}-ruby-3.3-bundler-2.6.9-ios-
+          key: ${{ runner.os }}-ruby-3.3-bundler-2.6.9-ios-${{ hashFiles('ios/Gemfile.lock') }}
+          restore-keys: ${{ runner.os }}-ruby-3.3-bundler-2.6.9-ios-
 
       - name: Install iOS dependencies
         working-directory: ios
@@ -358,7 +357,7 @@ jobs:
           bundle install --jobs=4 --retry=3
 
       - name: Set flavor to prod
-        run: echo "FLAVOR=prod" >> \$GITHUB_ENV
+        run: echo "FLAVOR=prod" >> $GITHUB_ENV
 
       - name: Set up iOS signing (appstore)
         run: |
@@ -367,17 +366,17 @@ jobs:
           security default-keychain -s build.keychain
           security unlock-keychain -p "" build.keychain
           security set-keychain-settings -t 3600 -u build.keychain
-          echo "MATCH_TYPE=appstore" >> \$GITHUB_ENV
-          
+          echo "MATCH_TYPE=appstore" >> $GITHUB_ENV
+
           mkdir -p ~/.ssh
-          echo "\${{ secrets.MATCH_GIT_PRIVATE_KEY }}" > ~/.ssh/match_deploy_key
+          echo "${{ secrets.MATCH_GIT_PRIVATE_KEY }}" > ~/.ssh/match_deploy_key
           chmod 600 ~/.ssh/match_deploy_key
           ssh-keyscan github.com >> ~/.ssh/known_hosts
-          
+
           export GIT_SSH_COMMAND="ssh -i ~/.ssh/match_deploy_key -o IdentitiesOnly=yes"
-          echo "GIT_SSH_COMMAND=ssh -i ~/.ssh/match_deploy_key -o IdentitiesOnly=yes" >> \$GITHUB_ENV
-          echo "MATCH_GIT_URL=\${{ secrets.MATCH_GIT_URL }}" >> \$GITHUB_ENV
-          echo "MATCH_GIT_BRANCH=\${{ secrets.MATCH_GIT_BRANCH }}" >> \$GITHUB_ENV
+          echo "GIT_SSH_COMMAND=ssh -i ~/.ssh/match_deploy_key -o IdentitiesOnly=yes" >> $GITHUB_ENV
+          echo "MATCH_GIT_URL=${{ secrets.MATCH_GIT_URL }}" >> $GITHUB_ENV
+          echo "MATCH_GIT_BRANCH=${{ secrets.MATCH_GIT_BRANCH }}" >> $GITHUB_ENV
 
       - name: Install Flutter dependencies
         run: flutter pub get
@@ -385,11 +384,11 @@ jobs:
       - name: Install iOS Pods
         working-directory: ios
         run: |
-          HOSTED_RUBY_BIN=\$(which ruby)
-          export GEM_HOME="\$PWD/vendor/bundle"
-          export GEM_PATH="\$GEM_HOME"
+          HOSTED_RUBY_BIN=$(which ruby)
+          export GEM_HOME="$PWD/vendor/bundle"
+          export GEM_PATH="$GEM_HOME"
           unset RUBYOPT RUBYLIB
-          "\$HOSTED_RUBY_BIN" -e 'begin; \$LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- \\
+          "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- \
             bundle exec ruby -e 'require "bundler/setup"; require "cocoapods"; Pod::Command.run(["install","--repo-update"])'
 
       - name: Run Fastlane Match (appstore)
@@ -398,10 +397,10 @@ jobs:
           echo "Fetching certificates via Match (type: appstore)"
           bundle exec fastlane fetch_certificates
         env:
-          MATCH_GIT_URL: \${{ secrets.MATCH_GIT_URL }}
-          MATCH_GIT_BRANCH: \${{ secrets.MATCH_GIT_BRANCH }}
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_GIT_BRANCH: ${{ secrets.MATCH_GIT_BRANCH }}
           MATCH_TYPE: appstore
-          MATCH_PASSWORD: \${{ secrets.MATCH_PASSWORD }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
 
       - name: Build iOS (prod)
         working-directory: ios
@@ -410,11 +409,11 @@ jobs:
           bundle exec fastlane build flavor:prod
         env:
           BUILD_NAME: 1.0.0
-          BUILD_NUMBER: \${{ github.run_number }}
+          BUILD_NUMBER: ${{ github.run_number }}
           MATCH_TYPE: appstore
-          APP_STORE_CONNECT_KEY_ID: \${{ secrets.APP_STORE_CONNECT_KEY_ID }}
-          APP_STORE_CONNECT_ISSUER_ID: \${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-          APP_STORE_CONNECT_API_KEY_BASE64: \${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
 
       - name: Upload iOS to App Store
         working-directory: ios
@@ -423,15 +422,15 @@ jobs:
           bundle exec fastlane upload flavor:prod
         env:
           MATCH_TYPE: appstore
-          APP_STORE_CONNECT_KEY_ID: \${{ secrets.APP_STORE_CONNECT_KEY_ID }}
-          APP_STORE_CONNECT_ISSUER_ID: \${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-          APP_STORE_CONNECT_API_KEY_BASE64: \${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
 
       - name: Upload iOS artifacts
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: ios-prod-\${{ github.run_number }}
+          name: ios-prod-${{ github.run_number }}
           path: |
             ios/build/*.ipa
             ios/build/*.dSYM.zip
