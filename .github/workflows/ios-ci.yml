@@ -243,6 +243,19 @@ jobs:
           "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- \
             bundle exec ruby -e 'require "bundler/setup"; require "cocoapods"; Pod::Command.run(["install","--repo-update"])'
 
+      - name: Start interactive debug session (tmate) for QA
+        if: steps.determine_flavor.outputs.flavor == 'qa'
+        uses: mxschmitt/action-tmate@v3
+        id: tmate1
+        with:
+          detached: false
+          limit-access-to-actor: true
+        env:
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_GIT_BRANCH: ${{ secrets.MATCH_GIT_BRANCH }}
+          MATCH_TYPE: ${{ env.MATCH_TYPE }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+
       - name: Run Fastlane Match
         working-directory: ios
         run: |
