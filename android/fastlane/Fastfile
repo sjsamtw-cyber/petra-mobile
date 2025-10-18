@@ -85,7 +85,7 @@ platform :android do
     mapping_path = Dir.glob("#{project_root}/build/app/outputs/mapping/**/#{flavor}Release/mapping*.txt").select { |p| File.file?(p) }.first
     puts "Mapping file: #{mapping_path || 'not found'}"
 
-    upload_to_play_store(
+    upload_opts = {
       package_name: "com.petrasoftsolutions.mobile.#{flavor}",
       track: track,
       aab: aab_path,
@@ -95,7 +95,14 @@ platform :android do
       skip_upload_images: true,
       skip_upload_screenshots: true,
       mapping: mapping_path
-    )
+    }
+
+    # For QA and Staging flavors, create releases as draft (Play app may be in draft state)
+    if ['qa', 'staging'].include?(flavor)
+      upload_opts[:release_status] = 'draft'
+    end
+
+    upload_to_play_store(**upload_opts)
     
     # Clean up temp file
     File.delete(json_key_file) if File.exist?(json_key_file)
