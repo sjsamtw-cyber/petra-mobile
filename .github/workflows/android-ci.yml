@@ -115,8 +115,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: android/vendor/bundle
-          key: \${{ runner.os }}-ruby-3.3-bundler-2.6.9-android-\${{ hashFiles('android/Gemfile.lock') }}
-          restore-keys: \${{ runner.os }}-ruby-3.3-bundler-2.6.9-android-
+          key: ${{ runner.os }}-ruby-3.3-bundler-2.6.9-android-${{ hashFiles('android/Gemfile.lock') }}
+          restore-keys: ${{ runner.os }}-ruby-3.3-bundler-2.6.9-android-
 
       - name: Install Android Fastlane dependencies
         working-directory: android
@@ -135,43 +135,43 @@ jobs:
       - name: Determine flavor from branch
         id: determine_flavor
         run: |
-          if [ -n "\${GITHUB_HEAD_REF}" ]; then
-            BRANCH_NAME=\${GITHUB_HEAD_REF}
+          if [ -n "${GITHUB_HEAD_REF}" ]; then
+            BRANCH_NAME=${GITHUB_HEAD_REF}
           else
-            BRANCH_NAME=\${GITHUB_REF#refs/heads/}
+            BRANCH_NAME=${GITHUB_REF#refs/heads/}
           fi
-          echo "Branch detected: \$BRANCH_NAME"
-          if [[ "\$BRANCH_NAME" == "main" ]]; then
+          echo "Branch detected: $BRANCH_NAME"
+          if [[ "$BRANCH_NAME" == "main" ]]; then
             FLAV=dev
-          elif [[ "\$BRANCH_NAME" =~ ^mobile-(dev|qa|staging|prod)\$ ]]; then
-            FLAV=\${BRANCH_NAME#mobile-}
+          elif [[ "$BRANCH_NAME" =~ ^mobile-(dev|qa|staging|prod)$ ]]; then
+            FLAV=${BRANCH_NAME#mobile-}
           else
             echo "Branch name doesn't match main or mobile-<flavor>; defaulting to dev"
             FLAV=dev
           fi
-          echo "FLAVOR=\$FLAV" >> \$GITHUB_ENV
-          echo "flavor=\$FLAV" >> \$GITHUB_OUTPUT
+          echo "FLAVOR=$FLAV" >> $GITHUB_ENV
+          echo "flavor=$FLAV" >> $GITHUB_OUTPUT
 
       - name: Set up Android keystore (non-prod)
         run: |
           echo "== Android Keystore Setup (NON-PROD) =="
-          echo "\${{ secrets.ANDROID_KEYSTORE_NONPROD_BASE64 }}" | base64 --decode > android/petra-nonprod-key.jks
-          EXPECTED_SHA="\${{ secrets.ANDROID_KEYSTORE_NONPROD_SHA256 }}"
-          ACTUAL_SHA=\$(sha256sum android/petra-nonprod-key.jks | awk '{print \$1}')
-          echo "NON-PROD Keystore SHA256: \$ACTUAL_SHA"
+          echo "${{ secrets.ANDROID_KEYSTORE_NONPROD_BASE64 }}" | base64 --decode > android/petra-nonprod-key.jks
+          EXPECTED_SHA="${{ secrets.ANDROID_KEYSTORE_NONPROD_SHA256 }}"
+          ACTUAL_SHA=$(sha256sum android/petra-nonprod-key.jks | awk '{print $1}')
+          echo "NON-PROD Keystore SHA256: $ACTUAL_SHA"
 
-          if [[ "\$ACTUAL_SHA" != "\$EXPECTED_SHA" ]]; then
+          if [[ "$ACTUAL_SHA" != "$EXPECTED_SHA" ]]; then
             echo "ERROR: Keystore SHA256 mismatch!"
-            echo "Expected: \$EXPECTED_SHA"
-            echo "Actual: \$ACTUAL_SHA"
+            echo "Expected: $EXPECTED_SHA"
+            echo "Actual: $ACTUAL_SHA"
             exit 1
           fi
 
           echo "Keystore verification passed ✓"
-          echo "KEYSTORE_FILE=\$PWD/android/petra-nonprod-key.jks" >> \$GITHUB_ENV
-          echo "KEYSTORE_PASSWORD=\${{ secrets.ANDROID_KEYSTORE_NONPROD_STORE_PASSWORD }}" >> \$GITHUB_ENV
-          echo "KEY_ALIAS=\${{ secrets.ANDROID_KEYSTORE_NONPROD_KEY_ALIAS }}" >> \$GITHUB_ENV
-          echo "KEY_PASSWORD=\${{ secrets.ANDROID_KEYSTORE_NONPROD_KEY_PASSWORD }}" >> \$GITHUB_ENV
+          echo "KEYSTORE_FILE=$PWD/android/petra-nonprod-key.jks" >> $GITHUB_ENV
+          echo "KEYSTORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_NONPROD_STORE_PASSWORD }}" >> $GITHUB_ENV
+          echo "KEY_ALIAS=${{ secrets.ANDROID_KEYSTORE_NONPROD_KEY_ALIAS }}" >> $GITHUB_ENV
+          echo "KEY_PASSWORD=${{ secrets.ANDROID_KEYSTORE_NONPROD_KEY_PASSWORD }}" >> $GITHUB_ENV
 
       - name: Cache Gradle dependencies
         uses: actions/cache@v4
@@ -185,8 +185,8 @@ jobs:
       - name: Create local.properties
         working-directory: android
         run: |
-          echo "flutter.sdk=\$FLUTTER_ROOT" > local.properties
-          echo "sdk.dir=\$ANDROID_HOME" >> local.properties
+          echo "flutter.sdk=$FLUTTER_ROOT" > local.properties
+          echo "sdk.dir=$ANDROID_HOME" >> local.properties
 
       - name: Install Flutter dependencies
         run: flutter pub get
@@ -194,16 +194,16 @@ jobs:
       - name: Create key.properties
         working-directory: android
         run: |
-          echo "storeFile=\$KEYSTORE_FILE" > key.properties
-          echo "storePassword=\$KEYSTORE_PASSWORD" >> key.properties
-          echo "keyPassword=\$KEY_PASSWORD" >> key.properties
-          echo "keyAlias=\$KEY_ALIAS" >> key.properties
+          echo "storeFile=$KEYSTORE_FILE" > key.properties
+          echo "storePassword=$KEYSTORE_PASSWORD" >> key.properties
+          echo "keyPassword=$KEY_PASSWORD" >> key.properties
+          echo "keyAlias=$KEY_ALIAS" >> key.properties
 
       - name: Build Android
         working-directory: android
         run: |
-          echo "Building Android flavor: \$FLAVOR"
-          bundle exec fastlane build flavor:\$FLAVOR
+          echo "Building Android flavor: $FLAVOR"
+          bundle exec fastlane build flavor:$FLAVOR
         env:
           BUILD_NAME: 1.0.0
           BUILD_NUMBER: ${{ github.run_number }}
@@ -216,8 +216,8 @@ jobs:
         if: steps.determine_flavor.outputs.flavor == 'qa' || steps.determine_flavor.outputs.flavor == 'staging'
         working-directory: android
         run: |
-          echo "Uploading Android flavor: \$FLAVOR to Play Store Internal track"
-          bundle exec fastlane upload flavor:\$FLAVOR
+          echo "Uploading Android flavor: $FLAVOR to Play Store Internal track"
+          bundle exec fastlane upload flavor:$FLAVOR
         env:
           GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_QA: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_QA }}
           GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_STAGING: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_STAGING }}
@@ -300,28 +300,28 @@ jobs:
           path: coverage/
 
       - name: Set flavor to prod
-        run: echo "FLAVOR=prod" >> \$GITHUB_ENV
+        run: echo "FLAVOR=prod" >> $GITHUB_ENV
 
       - name: Set up Android keystore (prod)
         run: |
           echo "== Android Keystore Setup (PROD) =="
-          echo "\${{ secrets.ANDROID_KEYSTORE_PROD_BASE64 }}" | base64 --decode > android/petra-release-key.jks
-          EXPECTED_SHA="\${{ secrets.ANDROID_KEYSTORE_PROD_SHA256 }}"
-          ACTUAL_SHA=\$(sha256sum android/petra-release-key.jks | awk '{print \$1}')
-          echo "PROD Keystore SHA256: \$ACTUAL_SHA"
+          echo "${{ secrets.ANDROID_KEYSTORE_PROD_BASE64 }}" | base64 --decode > android/petra-release-key.jks
+          EXPECTED_SHA="${{ secrets.ANDROID_KEYSTORE_PROD_SHA256 }}"
+          ACTUAL_SHA=$(sha256sum android/petra-release-key.jks | awk '{print $1}')
+          echo "PROD Keystore SHA256: $ACTUAL_SHA"
 
-          if [[ "\$ACTUAL_SHA" != "\$EXPECTED_SHA" ]]; then
+          if [[ "$ACTUAL_SHA" != "$EXPECTED_SHA" ]]; then
             echo "ERROR: Keystore SHA256 mismatch!"
-            echo "Expected: \$EXPECTED_SHA"
-            echo "Actual: \$ACTUAL_SHA"
+            echo "Expected: $EXPECTED_SHA"
+            echo "Actual: $ACTUAL_SHA"
             exit 1
           fi
 
           echo "Keystore verification passed ✓"
-          echo "KEYSTORE_FILE=\$PWD/android/petra-release-key.jks" >> \$GITHUB_ENV
-          echo "KEYSTORE_PASSWORD=\${{ secrets.ANDROID_KEYSTORE_PROD_STORE_PASSWORD }}" >> \$GITHUB_ENV
-          echo "KEY_ALIAS=\${{ secrets.ANDROID_KEYSTORE_PROD_KEY_ALIAS }}" >> \$GITHUB_ENV
-          echo "KEY_PASSWORD=\${{ secrets.ANDROID_KEYSTORE_PROD_KEY_PASSWORD }}" >> \$GITHUB_ENV
+          echo "KEYSTORE_FILE=$PWD/android/petra-release-key.jks" >> $GITHUB_ENV
+          echo "KEYSTORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PROD_STORE_PASSWORD }}" >> $GITHUB_ENV
+          echo "KEY_ALIAS=${{ secrets.ANDROID_KEYSTORE_PROD_KEY_ALIAS }}" >> $GITHUB_ENV
+          echo "KEY_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PROD_KEY_PASSWORD }}" >> $GITHUB_ENV
 
       - name: Cache Gradle dependencies
         uses: actions/cache@v4
@@ -335,8 +335,8 @@ jobs:
       - name: Create local.properties
         working-directory: android
         run: |
-          echo "flutter.sdk=\$FLUTTER_ROOT" > local.properties
-          echo "sdk.dir=\$ANDROID_HOME" >> local.properties
+          echo "flutter.sdk=$FLUTTER_ROOT" > local.properties
+          echo "sdk.dir=$ANDROID_HOME" >> local.properties
 
       - name: Install Flutter dependencies
         run: flutter pub get
@@ -344,10 +344,10 @@ jobs:
       - name: Create key.properties
         working-directory: android
         run: |
-          echo "storeFile=\$KEYSTORE_FILE" > key.properties
-          echo "storePassword=\$KEYSTORE_PASSWORD" >> key.properties
-          echo "keyPassword=\$KEY_PASSWORD" >> key.properties
-          echo "keyAlias=\$KEY_ALIAS" >> key.properties
+          echo "storeFile=$KEYSTORE_FILE" > key.properties
+          echo "storePassword=$KEYSTORE_PASSWORD" >> key.properties
+          echo "keyPassword=$KEY_PASSWORD" >> key.properties
+          echo "keyAlias=$KEY_ALIAS" >> key.properties
 
       - name: Build Android (prod)
         working-directory: android
