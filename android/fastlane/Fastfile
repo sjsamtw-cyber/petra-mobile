@@ -15,6 +15,8 @@ platform :android do
         "android.injected.signing.store.password" => ENV['KEYSTORE_PASSWORD'],
         "android.injected.signing.key.alias" => ENV['KEY_ALIAS'],
         "android.injected.signing.key.password" => ENV['KEY_PASSWORD'],
+        # inject the CI build number into Gradle properties (will be available as -PbuildNumber=...)
+        "buildNumber" => (ENV['BUILD_NUMBER'] || ENV['GITHUB_RUN_NUMBER'] || '')
       }
     )
     
