@@ -58,7 +58,7 @@ platform :android do
       "build/app/outputs/bundle/**/*#{flavor}*.aab",
       "build/app/**/*.aab",
     ]
-
+    puts Dir.glob("*")
     aab_path = nil
     aab_globs.each do |g|
       found = Dir.glob(g).select { |p| File.file?(p) }.first

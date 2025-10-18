@@ -473,6 +473,16 @@ jobs:
           KEY_ALIAS: ${{ env.KEY_ALIAS }}
           KEY_PASSWORD: ${{ env.KEY_PASSWORD }}
 
+      - name: Upload Android to Play Store
+        if: steps.determine_flavor.outputs.flavor == 'qa' || steps.determine_flavor.outputs.flavor == 'staging'
+        working-directory: android
+        run: |
+          echo "Uploading Android flavor: $FLAVOR to Play Store Internal track"
+          bundle exec fastlane upload flavor:$FLAVOR
+        env:
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_QA: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_QA }}
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_STAGING: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_STAGING }}
+
       - name: Start interactive debug session (tmate) for QA
         if: steps.determine_flavor.outputs.flavor == 'qa'
         uses: mxschmitt/action-tmate@v3
@@ -487,16 +497,6 @@ jobs:
           echo "Debug window open for 1 hour (3600s). Connect via tmate now and run diagnostics."
           # give operator time to connect and inspect the runner
           sleep 3600
-
-      - name: Upload Android to Play Store
-        if: steps.determine_flavor.outputs.flavor == 'qa' || steps.determine_flavor.outputs.flavor == 'staging'
-        working-directory: android
-        run: |
-          echo "Uploading Android flavor: $FLAVOR to Play Store Internal track"
-          bundle exec fastlane upload flavor:$FLAVOR
-        env:
-          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_QA: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_QA }}
-          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_STAGING: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_STAGING }}
 
       - name: Upload Android artifacts (AAB + mapping)
         uses: actions/upload-artifact@v4
