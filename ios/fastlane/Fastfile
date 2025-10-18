@@ -11,7 +11,7 @@ platform :ios do
       git_url: ENV['MATCH_GIT_URL'],
       git_branch: ENV['MATCH_GIT_BRANCH'],
       keychain_name: "build.keychain",
-      keychain_password: ""
+      keychain_password: ENV['MATCH_PASSWORD']
     )
   end
 
