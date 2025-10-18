@@ -36,8 +36,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.pub-cache
-          key: \${{ runner.os }}-pub-\${{ hashFiles('**/pubspec.lock') }}
-          restore-keys: \${{ runner.os }}-pub-
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
 
       - name: Install Flutter dependencies
         run: flutter pub get
@@ -57,7 +57,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: android-test-results-\${{ github.run_number }}
+          name: android-test-results-${{ github.run_number }}
           path: coverage/
           retention-days: 30
 
@@ -129,7 +129,7 @@ jobs:
       - name: Download test artifacts
         uses: actions/download-artifact@v4
         with:
-          name: android-test-results-\${{ github.run_number }}
+          name: android-test-results-${{ github.run_number }}
           path: coverage/
 
       - name: Determine flavor from branch
@@ -159,14 +159,14 @@ jobs:
           EXPECTED_SHA="\${{ secrets.ANDROID_KEYSTORE_NONPROD_SHA256 }}"
           ACTUAL_SHA=\$(sha256sum android/petra-nonprod-key.jks | awk '{print \$1}')
           echo "NON-PROD Keystore SHA256: \$ACTUAL_SHA"
-          
+
           if [[ "\$ACTUAL_SHA" != "\$EXPECTED_SHA" ]]; then
             echo "ERROR: Keystore SHA256 mismatch!"
             echo "Expected: \$EXPECTED_SHA"
             echo "Actual: \$ACTUAL_SHA"
             exit 1
           fi
-          
+
           echo "Keystore verification passed ✓"
           echo "KEYSTORE_FILE=\$PWD/android/petra-nonprod-key.jks" >> \$GITHUB_ENV
           echo "KEYSTORE_PASSWORD=\${{ secrets.ANDROID_KEYSTORE_NONPROD_STORE_PASSWORD }}" >> \$GITHUB_ENV
@@ -179,8 +179,8 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: gradle-cache-\${{ runner.os }}-\${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: gradle-cache-\${{ runner.os }}-
+          key: gradle-cache-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: gradle-cache-${{ runner.os }}-
 
       - name: Create local.properties
         working-directory: android
@@ -206,11 +206,11 @@ jobs:
           bundle exec fastlane build flavor:\$FLAVOR
         env:
           BUILD_NAME: 1.0.0
-          BUILD_NUMBER: \${{ github.run_number }}
-          KEYSTORE_FILE: \${{ env.KEYSTORE_FILE }}
-          KEYSTORE_PASSWORD: \${{ env.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: \${{ env.KEY_ALIAS }}
-          KEY_PASSWORD: \${{ env.KEY_PASSWORD }}
+          BUILD_NUMBER: ${{ github.run_number }}
+          KEYSTORE_FILE: ${{ env.KEYSTORE_FILE }}
+          KEYSTORE_PASSWORD: ${{ env.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ env.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ env.KEY_PASSWORD }}
 
       - name: Upload Android to Play Store
         if: steps.determine_flavor.outputs.flavor == 'qa' || steps.determine_flavor.outputs.flavor == 'staging'
@@ -219,14 +219,14 @@ jobs:
           echo "Uploading Android flavor: \$FLAVOR to Play Store Internal track"
           bundle exec fastlane upload flavor:\$FLAVOR
         env:
-          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_QA: \${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_QA }}
-          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_STAGING: \${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_STAGING }}
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_QA: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_QA }}
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_STAGING: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_STAGING }}
 
       - name: Upload Android artifacts
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: android-\${{ steps.determine_flavor.outputs.flavor }}-\${{ github.run_number }}
+          name: android-${{ steps.determine_flavor.outputs.flavor }}-${{ github.run_number }}
           path: |
             build/app/outputs/bundle/**/*.aab
             build/app/outputs/mapping/**/*.txt
@@ -282,8 +282,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: android/vendor/bundle
-          key: \${{ runner.os }}-ruby-3.3-bundler-2.6.9-android-\${{ hashFiles('android/Gemfile.lock') }}
-          restore-keys: \${{ runner.os }}-ruby-3.3-bundler-2.6.9-android-
+          key: ${{ runner.os }}-ruby-3.3-bundler-2.6.9-android-${{ hashFiles('android/Gemfile.lock') }}
+          restore-keys: ${{ runner.os }}-ruby-3.3-bundler-2.6.9-android-
 
       - name: Install Android Fastlane dependencies
         working-directory: android
@@ -296,7 +296,7 @@ jobs:
       - name: Download test artifacts
         uses: actions/download-artifact@v4
         with:
-          name: android-test-results-\${{ github.run_number }}
+          name: android-test-results-${{ github.run_number }}
           path: coverage/
 
       - name: Set flavor to prod
@@ -309,14 +309,14 @@ jobs:
           EXPECTED_SHA="\${{ secrets.ANDROID_KEYSTORE_PROD_SHA256 }}"
           ACTUAL_SHA=\$(sha256sum android/petra-release-key.jks | awk '{print \$1}')
           echo "PROD Keystore SHA256: \$ACTUAL_SHA"
-          
+
           if [[ "\$ACTUAL_SHA" != "\$EXPECTED_SHA" ]]; then
             echo "ERROR: Keystore SHA256 mismatch!"
             echo "Expected: \$EXPECTED_SHA"
             echo "Actual: \$ACTUAL_SHA"
             exit 1
           fi
-          
+
           echo "Keystore verification passed ✓"
           echo "KEYSTORE_FILE=\$PWD/android/petra-release-key.jks" >> \$GITHUB_ENV
           echo "KEYSTORE_PASSWORD=\${{ secrets.ANDROID_KEYSTORE_PROD_STORE_PASSWORD }}" >> \$GITHUB_ENV
@@ -329,8 +329,8 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: gradle-cache-\${{ runner.os }}-\${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: gradle-cache-\${{ runner.os }}-
+          key: gradle-cache-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: gradle-cache-${{ runner.os }}-
 
       - name: Create local.properties
         working-directory: android
@@ -356,11 +356,11 @@ jobs:
           bundle exec fastlane build flavor:prod
         env:
           BUILD_NAME: 1.0.0
-          BUILD_NUMBER: \${{ github.run_number }}
-          KEYSTORE_FILE: \${{ env.KEYSTORE_FILE }}
-          KEYSTORE_PASSWORD: \${{ env.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: \${{ env.KEY_ALIAS }}
-          KEY_PASSWORD: \${{ env.KEY_PASSWORD }}
+          BUILD_NUMBER: ${{ github.run_number }}
+          KEYSTORE_FILE: ${{ env.KEYSTORE_FILE }}
+          KEYSTORE_PASSWORD: ${{ env.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ env.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ env.KEY_PASSWORD }}
 
       - name: Upload Android to Play Store (production)
         working-directory: android
@@ -368,13 +368,13 @@ jobs:
           echo "Uploading Android prod to Play Store production track"
           bundle exec fastlane upload flavor:prod
         env:
-          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_PROD: \${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_PROD }}
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_PROD: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_PROD }}
 
       - name: Upload Android artifacts
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: android-prod-\${{ github.run_number }}
+          name: android-prod-${{ github.run_number }}
           path: |
             build/app/outputs/bundle/**/*.aab
             build/app/outputs/mapping/**/*.txt
