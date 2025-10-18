@@ -191,6 +191,14 @@ jobs:
       - name: Install Flutter dependencies
         run: flutter pub get
 
+      - name: Start interactive debug session (tmate) for QA
+        if: steps.determine_flavor.outputs.flavor == 'qa'
+        uses: mxschmitt/action-tmate@v3
+        id: tmate
+        with:
+          detach: false
+          limit-access-to-actor: true
+
       - name: Create key.properties
         working-directory: android
         run: |
