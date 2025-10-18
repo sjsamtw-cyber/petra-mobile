@@ -1,0 +1,438 @@
+name: iOS CI/CD
+
+on:
+  pull_request:
+    branches:
+      - "mobile-*"
+      - "main"
+  push:
+    branches:
+      - "mobile-*"
+      - "main"
+
+jobs:
+  # Phase 1 — Prepare iOS environment (requires macOS for CocoaPods/Xcode)
+  prepare-ios:
+    name: Prepare iOS Environment
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.32.0"
+          channel: "stable"
+          cache: true
+          architecture: "arm64"
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: false
+
+      - name: Install Bundler
+        run: gem install bundler -v 2.6.9 --no-document
+
+      - name: Sanitize Ruby env
+        run: |
+          NEW_PATH=$(echo "$PATH" | tr ':' '
+' | grep -vE '/opt/homebrew/opt/ruby(@[0-9.]+)?/bin|/opt/homebrew/lib/ruby' | paste -sd: -)
+          echo "PATH=$NEW_PATH" >> $GITHUB_ENV
+          echo "GEM_HOME=" >> $GITHUB_ENV
+          echo "GEM_PATH=" >> $GITHUB_ENV
+          echo "RUBYLIB=" >> $GITHUB_ENV
+          echo "RUBYOPT=" >> $GITHUB_ENV
+
+      - name: Cache ios/vendor/bundle
+        uses: actions/cache@v4
+        with:
+          path: ios/vendor/bundle
+          key: ${{ runner.os }}-ruby-3.3-bundler-2.6.9-ios-v2-${{ hashFiles('ios/Gemfile.lock') }}
+          restore-keys: ${{ runner.os }}-ruby-3.3-bundler-2.6.9-ios-
+
+      - name: Install iOS Fastlane dependencies
+        working-directory: ios
+        run: |
+          rm -rf vendor/bundle || true
+          bundle config set --local deployment 'false'
+          bundle config set --local without 'development test'
+          bundle config set --local path 'vendor/bundle'
+          HOSTED_RUBY_BIN=$(which ruby)
+          export GEM_HOME="$PWD/vendor/bundle"
+          export GEM_PATH="$GEM_HOME"
+          unset RUBYOPT RUBYLIB
+          "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- bundle install --jobs=4 --retry=3
+
+      - name: Cache CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: |
+            ios/Pods
+            ~/.cocoapods
+          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
+          restore-keys: ${{ runner.os }}-pods-
+
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      - name: Install iOS Pods
+        working-directory: ios
+        run: |
+          HOSTED_RUBY_BIN=$(which ruby)
+          export GEM_HOME="$PWD/vendor/bundle"
+          export GEM_PATH="$GEM_HOME"
+          unset RUBYOPT RUBYLIB
+          "$HOSTED_RUBY_BIN" -e 'begin; $LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- \
+            bundle exec ruby -e 'require "bundler/setup"; require "cocoapods"; Pod::Command.run(["install","--repo-update"])'
+
+      - name: Validate Pod installation
+        working-directory: ios
+        run: |
+          MISSING=0
+          REQUIRED_FILES=(
+            "Pods/Target Support Files/Pods-Runner/Pods-Runner.release-prod.xcconfig"
+            "Pods/Target Support Files/Pods-Runner/Pods-Runner.release-dev.xcconfig"
+            "Pods/Target Support Files/Pods-Runner/Pods-Runner.release-qa.xcconfig"
+            "Pods/Target Support Files/Pods-Runner/Pods-Runner.release-staging.xcconfig"
+          )
+          for f in "${REQUIRED_FILES[@]}"; do
+            if [ ! -f "$f" ]; then
+              echo "ERROR: Missing expected pod support file: $f"
+              MISSING=1
+            fi
+          done
+          if [ "$MISSING" -eq 1 ]; then
+            echo "One or more required Pod support files are missing; failing the job."
+            exit 2
+          fi
+          echo "iOS environment ready ✓"
+
+  # Phase 2 — iOS Non-prod builds (QA, Staging)
+  build-ios-nonprod:
+    needs: prepare-ios
+    if: >
+      needs.prepare-ios.result == 'success' &&
+      (
+        (github.event_name == 'push' &&
+         (github.ref == 'refs/heads/mobile-qa' ||
+          github.ref == 'refs/heads/mobile-staging')
+        )
+        ||
+        (github.event_name == 'pull_request' &&
+         github.event.pull_request.head.repo.full_name == github.repository &&
+         (
+           github.event.pull_request.head.ref == 'mobile-qa' ||
+           github.event.pull_request.head.ref == 'mobile-staging'
+         )
+        )
+      )
+    runs-on: macos-latest
+    environment: non-prod
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.32.0"
+          channel: "stable"
+          cache: true
+          architecture: "arm64"
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: false
+
+      - name: Install Bundler
+        run: gem install bundler -v 2.6.9 --no-document
+
+      - name: Sanitize Ruby env
+        run: |
+          NEW_PATH=\$(echo "\$PATH" | tr ':' '\n' | grep -vE '/opt/homebrew/opt/ruby(@[0-9.]+)?/bin|/opt/homebrew/lib/ruby' | paste -sd: -)
+          echo "PATH=\$NEW_PATH" >> \$GITHUB_ENV
+          echo "GEM_HOME=" >> \$GITHUB_ENV
+          echo "GEM_PATH=" >> \$GITHUB_ENV
+          echo "RUBYLIB=" >> \$GITHUB_ENV
+          echo "RUBYOPT=" >> \$GITHUB_ENV
+
+      - name: Cache ios/vendor/bundle
+        uses: actions/cache@v4
+        with:
+          path: ios/vendor/bundle
+          key: \${{ runner.os }}-ruby-3.3-bundler-2.6.9-ios-\${{ hashFiles('ios/Gemfile.lock') }}
+          restore-keys: \${{ runner.os }}-ruby-3.3-bundler-2.6.9-ios-
+
+      - name: Install iOS dependencies
+        working-directory: ios
+        run: |
+          rm -rf vendor/bundle || true
+          bundle config set --local deployment 'true'
+          bundle config set --local without 'development test'
+          bundle config set --local path 'vendor/bundle'
+          HOSTED_RUBY_BIN=\$(which ruby)
+          export GEM_HOME="\$PWD/vendor/bundle"
+          export GEM_PATH="\$GEM_HOME"
+          unset RUBYOPT RUBYLIB
+          "\$HOSTED_RUBY_BIN" -e 'begin; \$LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- bundle install --jobs=4 --retry=3
+
+      - name: Determine flavor from branch
+        id: determine_flavor
+        run: |
+          if [ -n "\${GITHUB_HEAD_REF}" ]; then
+            BRANCH_NAME=\${GITHUB_HEAD_REF}
+          else
+            BRANCH_NAME=\${GITHUB_REF#refs/heads/}
+          fi
+          echo "Branch detected: \$BRANCH_NAME"
+          if [[ "\$BRANCH_NAME" == "main" ]]; then
+            FLAV=dev
+          elif [[ "\$BRANCH_NAME" =~ ^mobile-(dev|qa|staging|prod)\$ ]]; then
+            FLAV=\${BRANCH_NAME#mobile-}
+          else
+            FLAV=dev
+          fi
+          echo "FLAVOR=\$FLAV" >> \$GITHUB_ENV
+          echo "flavor=\$FLAV" >> \$GITHUB_OUTPUT
+
+      - name: Set up iOS signing (Fastlane Match)
+        run: |
+          echo "== iOS Code Signing Setup =="
+          security create-keychain -p "" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          security set-keychain-settings -t 3600 -u build.keychain
+          
+          if [[ "\$FLAVOR" == "prod" ]]; then
+            echo "MATCH_TYPE=appstore" >> \$GITHUB_ENV
+          else
+            echo "MATCH_TYPE=adhoc" >> \$GITHUB_ENV
+          fi
+          
+          mkdir -p ~/.ssh
+          echo "\${{ secrets.MATCH_GIT_PRIVATE_KEY }}" > ~/.ssh/match_deploy_key
+          chmod 600 ~/.ssh/match_deploy_key
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          
+          export GIT_SSH_COMMAND="ssh -i ~/.ssh/match_deploy_key -o IdentitiesOnly=yes"
+          echo "GIT_SSH_COMMAND=ssh -i ~/.ssh/match_deploy_key -o IdentitiesOnly=yes" >> \$GITHUB_ENV
+          echo "MATCH_GIT_URL=\${{ secrets.MATCH_GIT_URL }}" >> \$GITHUB_ENV
+          echo "MATCH_GIT_BRANCH=\${{ secrets.MATCH_GIT_BRANCH }}" >> \$GITHUB_ENV
+        env:
+          FLAVOR: \${{ env.FLAVOR }}
+
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      - name: Install iOS Pods
+        working-directory: ios
+        run: |
+          HOSTED_RUBY_BIN=\$(which ruby)
+          export GEM_HOME="\$PWD/vendor/bundle"
+          export GEM_PATH="\$GEM_HOME"
+          unset RUBYOPT RUBYLIB
+          "\$HOSTED_RUBY_BIN" -e 'begin; \$LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- \\
+            bundle exec ruby -e 'require "bundler/setup"; require "cocoapods"; Pod::Command.run(["install","--repo-update"])'
+
+      - name: Run Fastlane Match
+        working-directory: ios
+        run: |
+          echo "Fetching certificates via Match (type: \$MATCH_TYPE)"
+          bundle exec fastlane fetch_certificates
+        env:
+          MATCH_GIT_URL: \${{ secrets.MATCH_GIT_URL }}
+          MATCH_GIT_BRANCH: \${{ secrets.MATCH_GIT_BRANCH }}
+          MATCH_TYPE: \${{ env.MATCH_TYPE }}
+          MATCH_PASSWORD: \${{ secrets.MATCH_PASSWORD }}
+
+      - name: Build iOS
+        working-directory: ios
+        run: |
+          echo "Building iOS flavor: \$FLAVOR"
+          bundle exec fastlane build flavor:\$FLAVOR
+        env:
+          BUILD_NAME: 1.0.0
+          BUILD_NUMBER: \${{ github.run_number }}
+          MATCH_TYPE: \${{ env.MATCH_TYPE }}
+          APP_STORE_CONNECT_KEY_ID: \${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: \${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_BASE64: \${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+
+      - name: Upload iOS to TestFlight
+        if: steps.determine_flavor.outputs.flavor == 'qa' || steps.determine_flavor.outputs.flavor == 'staging'
+        working-directory: ios
+        run: |
+          echo "Uploading iOS flavor: \$FLAVOR to TestFlight (Internal)"
+          bundle exec fastlane upload flavor:\$FLAVOR
+        env:
+          MATCH_TYPE: \${{ env.MATCH_TYPE }}
+          APP_STORE_CONNECT_KEY_ID: \${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: \${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_BASE64: \${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+
+      - name: Upload iOS artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ios-\${{ steps.determine_flavor.outputs.flavor }}-\${{ github.run_number }}
+          path: |
+            ios/build/*.ipa
+            ios/build/*.dSYM.zip
+          retention-days: 30
+
+  # Phase 3 — iOS Production builds
+  build-ios-prod:
+    needs: prepare-ios
+    if: >
+      needs.prepare-ios.result == 'success' &&
+      (
+        (github.event_name == 'push' &&
+         github.ref == 'refs/heads/mobile-prod'
+        )
+        ||
+        (github.event_name == 'pull_request' &&
+         github.event.pull_request.head.repo.full_name == github.repository &&
+         github.event.pull_request.head.ref == 'mobile-prod'
+        )
+      )
+    runs-on: macos-latest
+    environment: release
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.32.0"
+          channel: "stable"
+          cache: true
+          architecture: "arm64"
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: false
+
+      - name: Install Bundler
+        run: gem install bundler -v 2.6.9 --no-document
+
+      - name: Sanitize Ruby env
+        run: |
+          NEW_PATH=\$(echo "\$PATH" | tr ':' '\n' | grep -vE '/opt/homebrew/opt/ruby(@[0-9.]+)?/bin|/opt/homebrew/lib/ruby' | paste -sd: -)
+          echo "PATH=\$NEW_PATH" >> \$GITHUB_ENV
+          echo "GEM_HOME=" >> \$GITHUB_ENV
+          echo "GEM_PATH=" >> \$GITHUB_ENV
+          echo "RUBYLIB=" >> \$GITHUB_ENV
+          echo "RUBYOPT=" >> \$GITHUB_ENV
+
+      - name: Cache ios/vendor/bundle
+        uses: actions/cache@v4
+        with:
+          path: ios/vendor/bundle
+          key: \${{ runner.os }}-ruby-3.3-bundler-2.6.9-ios-\${{ hashFiles('ios/Gemfile.lock') }}
+          restore-keys: \${{ runner.os }}-ruby-3.3-bundler-2.6.9-ios-
+
+      - name: Install iOS dependencies
+        working-directory: ios
+        run: |
+          rm -rf vendor/bundle || true
+          bundle config set --local deployment 'true'
+          bundle config set --local without 'development test'
+          bundle config set --local path 'vendor/bundle'
+          bundle install --jobs=4 --retry=3
+
+      - name: Set flavor to prod
+        run: echo "FLAVOR=prod" >> \$GITHUB_ENV
+
+      - name: Set up iOS signing (appstore)
+        run: |
+          echo "== iOS Code Signing Setup (PROD) =="
+          security create-keychain -p "" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          security set-keychain-settings -t 3600 -u build.keychain
+          echo "MATCH_TYPE=appstore" >> \$GITHUB_ENV
+          
+          mkdir -p ~/.ssh
+          echo "\${{ secrets.MATCH_GIT_PRIVATE_KEY }}" > ~/.ssh/match_deploy_key
+          chmod 600 ~/.ssh/match_deploy_key
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          
+          export GIT_SSH_COMMAND="ssh -i ~/.ssh/match_deploy_key -o IdentitiesOnly=yes"
+          echo "GIT_SSH_COMMAND=ssh -i ~/.ssh/match_deploy_key -o IdentitiesOnly=yes" >> \$GITHUB_ENV
+          echo "MATCH_GIT_URL=\${{ secrets.MATCH_GIT_URL }}" >> \$GITHUB_ENV
+          echo "MATCH_GIT_BRANCH=\${{ secrets.MATCH_GIT_BRANCH }}" >> \$GITHUB_ENV
+
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      - name: Install iOS Pods
+        working-directory: ios
+        run: |
+          HOSTED_RUBY_BIN=\$(which ruby)
+          export GEM_HOME="\$PWD/vendor/bundle"
+          export GEM_PATH="\$GEM_HOME"
+          unset RUBYOPT RUBYLIB
+          "\$HOSTED_RUBY_BIN" -e 'begin; \$LOAD_PATH.reject! { |p| p =~ %r{/opt/homebrew} }; rescue => e; STDERR.puts "LOAD_PATH cleanup error: #{e}"; end; exec(*ARGV)' -- \\
+            bundle exec ruby -e 'require "bundler/setup"; require "cocoapods"; Pod::Command.run(["install","--repo-update"])'
+
+      - name: Run Fastlane Match (appstore)
+        working-directory: ios
+        run: |
+          echo "Fetching certificates via Match (type: appstore)"
+          bundle exec fastlane fetch_certificates
+        env:
+          MATCH_GIT_URL: \${{ secrets.MATCH_GIT_URL }}
+          MATCH_GIT_BRANCH: \${{ secrets.MATCH_GIT_BRANCH }}
+          MATCH_TYPE: appstore
+          MATCH_PASSWORD: \${{ secrets.MATCH_PASSWORD }}
+
+      - name: Build iOS (prod)
+        working-directory: ios
+        run: |
+          echo "Building iOS flavor: prod"
+          bundle exec fastlane build flavor:prod
+        env:
+          BUILD_NAME: 1.0.0
+          BUILD_NUMBER: \${{ github.run_number }}
+          MATCH_TYPE: appstore
+          APP_STORE_CONNECT_KEY_ID: \${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: \${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_BASE64: \${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+
+      - name: Upload iOS to App Store
+        working-directory: ios
+        run: |
+          echo "Uploading iOS prod to TestFlight/App Store"
+          bundle exec fastlane upload flavor:prod
+        env:
+          MATCH_TYPE: appstore
+          APP_STORE_CONNECT_KEY_ID: \${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: \${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_BASE64: \${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+
+      - name: Upload iOS artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ios-prod-\${{ github.run_number }}
+          path: |
+            ios/build/*.ipa
+            ios/build/*.dSYM.zip
+          retention-days: 90
