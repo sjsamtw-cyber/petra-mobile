@@ -337,6 +337,22 @@ jobs:
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
 
+      - name: Start interactive debug session (tmate) before upload
+        if: steps.determine_flavor.outputs.flavor == 'qa' || steps.determine_flavor.outputs.flavor == 'staging'
+        uses: mxschmitt/action-tmate@v3
+        id: tmate_upload
+        with:
+          detached: false
+          limit-access-to-actor: true
+        env:
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_GIT_BRANCH: ${{ secrets.MATCH_GIT_BRANCH }}
+          MATCH_TYPE: ${{ env.MATCH_TYPE }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+
       - name: Upload iOS artifacts
         uses: actions/upload-artifact@v4
         if: always()
