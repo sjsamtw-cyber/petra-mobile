@@ -38,6 +38,54 @@
                         "appId": "1:465049471348:ios:3fbf375c897ac019ac4421",
                         "uploadDebugSymbols": false,
                         "fileOutput": ".firebase/prod/GoogleService-Info.plist"
+                    },
+                    "Debug-dev": {
+                        "projectId": "petrasoft-dev-fad85",
+                        "appId": "1:727282540846:ios:50e50befb6adad05561abf",
+                        "uploadDebugSymbols": false,
+                        "fileOutput": ".firebase/dev/GoogleService-Info.plist"
+                    },
+                    "Release-dev": {
+                        "projectId": "petrasoft-dev-fad85",
+                        "appId": "1:727282540846:ios:50e50befb6adad05561abf",
+                        "uploadDebugSymbols": false,
+                        "fileOutput": ".firebase/dev/GoogleService-Info.plist"
+                    },
+                    "Debug-qa": {
+                        "projectId": "petrasoft-qa",
+                        "appId": "1:1051869953939:ios:5e546444ecb98bd37b7266",
+                        "uploadDebugSymbols": false,
+                        "fileOutput": ".firebase/qa/GoogleService-Info.plist"
+                    },
+                    "Release-qa": {
+                        "projectId": "petrasoft-qa",
+                        "appId": "1:1051869953939:ios:5e546444ecb98bd37b7266",
+                        "uploadDebugSymbols": false,
+                        "fileOutput": ".firebase/qa/GoogleService-Info.plist"
+                    },
+                    "Debug-staging": {
+                        "projectId": "petrasoft-staging",
+                        "appId": "1:775235070455:ios:bff82caa8481fed286a6f2",
+                        "uploadDebugSymbols": false,
+                        "fileOutput": ".firebase/staging/GoogleService-Info.plist"
+                    },
+                    "Release-staging": {
+                        "projectId": "petrasoft-staging",
+                        "appId": "1:775235070455:ios:bff82caa8481fed286a6f2",
+                        "uploadDebugSymbols": false,
+                        "fileOutput": ".firebase/staging/GoogleService-Info.plist"
+                    },
+                    "Debug-prod": {
+                        "projectId": "petrasoft-prod",
+                        "appId": "1:465049471348:ios:3fbf375c897ac019ac4421",
+                        "uploadDebugSymbols": false,
+                        "fileOutput": ".firebase/prod/GoogleService-Info.plist"
+                    },
+                    "Release-prod": {
+                        "projectId": "petrasoft-prod",
+                        "appId": "1:465049471348:ios:3fbf375c897ac019ac4421",
+                        "uploadDebugSymbols": false,
+                        "fileOutput": ".firebase/prod/GoogleService-Info.plist"
                     }
                 },
                 "default": {
