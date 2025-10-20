@@ -57,12 +57,22 @@ platform :ios do
         method: ENV['MATCH_TYPE'] == 'appstore' ? 'app-store' : 'ad-hoc',
         provisioningProfiles: {
           "com.petrasoftsolutions.mobile.#{flavor}" => ENV['MATCH_TYPE'] == 'appstore' ? "match AppStore com.petrasoftsolutions.mobile.#{flavor}" : "match AdHoc com.petrasoftsolutions.mobile.#{flavor}"
-        }
+        },
       },
-      # Split debug info for crash symbolication
-      include_symbols: true,
-      include_bitcode: false
     )
+    
+    # CRITICAL FIX: Fastlane gym does NOT automatically copy SwiftSupport from xcarchive to IPA
+    # Manually add SwiftSupport folder to fix ITMS-90426 rejection
+    ipa_path = File.expand_path("../build/Runner-#{flavor}.ipa")
+    archive_path = lane_context[SharedValues::XCODEBUILD_ARCHIVE]
+    script_path = File.expand_path("../add_swift_support.sh")
+    
+    UI.important "🔧 Adding SwiftSupport to IPA (required for App Store submission)..."
+    UI.message "  IPA: #{ipa_path}"
+    UI.message "  Archive: #{archive_path}"
+    sh("chmod +x \"#{script_path}\"")
+    sh("\"#{script_path}\" \"#{ipa_path}\" \"#{archive_path}\"")
+    UI.success "✅ SwiftSupport successfully added to IPA"
   end
 
   desc "Upload iOS app to TestFlight or App Store"

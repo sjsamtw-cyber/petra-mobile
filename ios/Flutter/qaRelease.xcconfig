@@ -4,3 +4,6 @@
 ASSET_PREFIX=qa
 BUNDLE_NAME=(QA) Petrasoft School Management Solutions
 BUNDLE_DISPLAY_NAME=(QA) Petrasoft School Management Solutions
+
+// Ensure Swift stdlibs are embedded for release exports
+ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES

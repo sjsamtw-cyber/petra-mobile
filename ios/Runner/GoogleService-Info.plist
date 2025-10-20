@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>AIzaSyA4uQD8fJV2r3tn82KcXNvuOo8rRx0F07M</string>
+	<string>AIzaSyCi_lZ8FJ-OQukc3R9MV-2THUIvNKbk_dY</string>
 	<key>GCM_SENDER_ID</key>
-	<string>465049471348</string>
+	<string>1051869953939</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.petrasoftsolutions.mobile.prod</string>
+	<string>com.petrasoftsolutions.mobile.qa</string>
 	<key>PROJECT_ID</key>
-	<string>petrasoft-prod</string>
+	<string>petrasoft-qa</string>
 	<key>STORAGE_BUCKET</key>
-	<string>petrasoft-prod.firebasestorage.app</string>
+	<string>petrasoft-qa.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:465049471348:ios:3fbf375c897ac019ac4421</string>
+	<string>1:1051869953939:ios:5e546444ecb98bd37b7266</string>
 </dict>
 </plist>
