@@ -466,9 +466,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -505,9 +509,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -591,6 +599,7 @@
 			baseConfigurationReference = F84361A10694810E824F4CC5 /* devDebug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 9AV8848UR6;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -609,6 +618,7 @@
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 9AV8848UR6;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.petrasoftsolutions.mobile.staging;
@@ -810,6 +820,7 @@
 			baseConfigurationReference = A0145F79697A836A0EFE90AF /* qaProfile.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 9AV8848UR6;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -826,6 +837,7 @@
 			baseConfigurationReference = 2A34379718F4EDBCB039A6DD /* prodProfile.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 9AV8848UR6;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -989,6 +1001,7 @@
 			baseConfigurationReference = 6D01CF342C4871CE7C061F02 /* stagingDebug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 9AV8848UR6;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1007,6 +1020,7 @@
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 9AV8848UR6;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.petrasoftsolutions.mobile.prod;
@@ -1025,6 +1039,7 @@
 			baseConfigurationReference = F1CDF3316F048086DAD3B1D3 /* devRelease.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 9AV8848UR6;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1331,6 +1346,7 @@
 			baseConfigurationReference = A064488B4E82DEE3ABB1FC4A /* prodDebug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 9AV8848UR6;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1347,6 +1363,7 @@
 			baseConfigurationReference = F221F649C55659AFE8C8F6BD /* devProfile.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 9AV8848UR6;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1505,6 +1522,7 @@
 			baseConfigurationReference = 41928ADAE7F379B3851E2E93 /* stagingProfile.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 9AV8848UR6;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1665,6 +1683,7 @@
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 9AV8848UR6;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.petrasoftsolutions.mobile.qa;
@@ -1755,6 +1774,7 @@
 			baseConfigurationReference = 9065084226DB0BF3421A28D5 /* qaDebug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 9AV8848UR6;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";

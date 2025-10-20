@@ -51,3 +51,4 @@ android/local.properties
 
 # ignore bundler config
 ios/.bundle/config
+ios/fastlane/report.xml
