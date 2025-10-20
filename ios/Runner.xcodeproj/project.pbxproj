@@ -803,7 +803,7 @@
 				CODE_SIGN_STYLE = Manual;
 				PRODUCT_BUNDLE_IDENTIFIER = com.petrasoftsolutions.mobile.prod;
 				PRODUCT_NAME = RunnerTests;
-				PROVISIONING_PROFILE_SPECIFIER = "match AppStore com.petrasoftsolutions.mobile.prod";
+				PROVISIONING_PROFILE_SPECIFIER = "match AdHoc com.petrasoftsolutions.mobile.prod";
 			};
 			name = "Release-prod";
 		};
@@ -1017,7 +1017,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.petrasoftsolutions.mobile.prod;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "match AppStore com.petrasoftsolutions.mobile.prod";
+				PROVISIONING_PROFILE_SPECIFIER = "match AdHoc com.petrasoftsolutions.mobile.prod";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
