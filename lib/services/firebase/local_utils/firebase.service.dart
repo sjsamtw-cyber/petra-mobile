@@ -12,7 +12,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:petrasoft_school_management_solutions/flavors.dart';
 import 'package:petrasoft_school_management_solutions/services/app_preferences/model/app_preferences.dart';
-import 'package:petrasoft_school_management_solutions/services/firebase/models/firebase_options.dart';
 import 'package:petrasoft_school_management_solutions/services/firebase/models/notification_event.dart';
 
 class FirebaseService {
@@ -114,8 +113,10 @@ class FirebaseService {
     late FirebaseApp firebaseApp;
     if (!Firebase.apps.any((app) => app.name == F.appFlavor.name)) {
       firebaseApp = await Firebase.initializeApp(
+        /*
         name: F.appFlavor.name,
         options: DefaultFirebaseOptions.currentPlatform,
+        */
       );
     } else {
       firebaseApp = Firebase.apps.firstWhere(
