@@ -54,8 +54,10 @@ class FirebaseService {
     // Honour flavour-based Firebase setup
     if (!Firebase.apps.any((app) => app.name == F.appFlavor.name)) {
       await Firebase.initializeApp(
+        /*
         name: F.appFlavor.name,
         options: DefaultFirebaseOptions.currentPlatform,
+        */
       );
     }
 
